@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KegLevel Pico — Purchase</title>
+  <link rel="icon" href="assets/beer-keg.ico" type="image/x-icon">
+  <link rel="icon" href="assets/beer-keg.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/beer-keg.png">
+  <script src="https://gumroad.com/js/gumroad.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .page-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+      width: 100%;
+    }
+
+    /* ── Header ── */
+    .purchase-header {
+      background: #141414;
+      padding: 0 16px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .purchase-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffa500;
+    }
+    .back-link {
+      position: absolute;
+      left: 16px;
+      color: #aaa;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .back-link:hover { color: #fff; }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding: 48px 0 32px;
+    }
+    .hero-icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+    }
+    .hero h2 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #ffa500;
+      margin-bottom: 12px;
+    }
+    .hero .tagline {
+      font-size: 17px;
+      color: #bbb;
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* ── Features ── */
+    .features {
+      background: #141414;
+      border-radius: 8px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+    }
+    .features h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #e0e0e0;
+      margin-bottom: 16px;
+    }
+    .features ul {
+      list-style: none;
+      padding: 0;
+    }
+    .features li {
+      padding: 10px 0;
+      border-bottom: 1px solid #222;
+      font-size: 15px;
+      line-height: 1.5;
+      color: #ccc;
+    }
+    .features li:last-child { border-bottom: none; }
+    .features li .feat-label {
+      color: #ffa500;
+      font-weight: 600;
+    }
+
+    /* ── What's Included ── */
+    .included {
+      background: #141414;
+      border-radius: 8px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+    }
+    .included h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #e0e0e0;
+      margin-bottom: 16px;
+    }
+    .included ul {
+      list-style: disc;
+      padding-left: 20px;
+    }
+    .included li {
+      padding: 6px 0;
+      font-size: 15px;
+      line-height: 1.5;
+      color: #ccc;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center;
+      padding: 32px 0;
+    }
+    .cta-section .price-note {
+      font-size: 14px;
+      color: #888;
+      margin-bottom: 20px;
+    }
+    .btn-buy {
+      display: inline-block;
+      background: #27ae60;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 14px 48px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .btn-buy:hover { background: #2ecc71; }
+
+    .cta-section .demo-link {
+      display: block;
+      margin-top: 16px;
+      font-size: 14px;
+      color: #ffc107;
+      text-decoration: none;
+    }
+    .cta-section .demo-link:hover { color: #ffd54f; }
+
+    /* ── Footer ── */
+    .purchase-footer {
+      text-align: center;
+      padding: 24px 0;
+      color: #555;
+      font-size: 12px;
+      margin-top: auto;
+    }
+
+    @media (max-width: 480px) {
+      .hero h2 { font-size: 26px; }
+      .features, .included { padding: 20px; }
+      .btn-buy { padding: 14px 32px; font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="purchase-header">
+    <a href="index.html" class="back-link">&larr; Back to Demo</a>
+    <h1>KegLevel Pico</h1>
+  </header>
+
+  <div class="page-wrap">
+    <section class="hero">
+      <img src="assets/beer-keg.png" alt="KegLevel Pico" class="hero-icon">
+      <h2>Know What's on Tap</h2>
+      <p class="tagline">
+        A Raspberry Pi Pico-powered keg monitoring system that tracks
+        pour volumes, keg levels, and temperature &mdash; all from your browser.
+      </p>
+    </section>
+
+    <section class="features">
+      <h3>Features</h3>
+      <ul>
+        <li><span class="feat-label">Flow Monitoring</span> &mdash; Hall-effect sensors track every pour in real time across up to 5 taps</li>
+        <li><span class="feat-label">Keg Levels</span> &mdash; See remaining volume at a glance with visual level indicators</li>
+        <li><span class="feat-label">Temperature</span> &mdash; DS18B20 sensor shows live kegerator temperature</li>
+        <li><span class="feat-label">Web Dashboard</span> &mdash; Mobile-friendly UI served directly from the Pico &mdash; no cloud, no app install</li>
+        <li><span class="feat-label">BatchFlow</span> &mdash; Built-in brewing workflow board to track batches from recipe to keg</li>
+        <li><span class="feat-label">Alerts</span> &mdash; Email notifications via Mailgun when kegs run low or kick</li>
+        <li><span class="feat-label">OTA Updates</span> &mdash; Update firmware over WiFi without disconnecting anything</li>
+      </ul>
+    </section>
+
+    <section class="included">
+      <h3>What You Get</h3>
+      <ul>
+        <li>Complete firmware for Raspberry Pi Pico W</li>
+        <li>Web UI files (served from the Pico itself)</li>
+        <li>Wiring diagram and hardware parts list</li>
+        <li>Setup and installation guide</li>
+        <li>Free firmware updates</li>
+      </ul>
+    </section>
+
+    <section class="cta-section">
+      <p class="price-note">One-time purchase &mdash; no subscriptions, no cloud fees.</p>
+      <a class="btn-buy gumroad-button" href="https://keglevel.gumroad.com/l/kfrxo">BUY NOW</a>
+      <a class="demo-link" href="index.html">or try the interactive demo first &rarr;</a>
+    </section>
+  </div>
+
+  <footer class="purchase-footer">
+    &copy; 2026 KegLevel &mdash; Built for homebrewers, by a homebrewer.
+  </footer>
+
+</body>
+</html>
