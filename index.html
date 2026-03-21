@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KegLevel Demo</title>
+  <link rel="icon" href="assets/beer-keg.ico" type="image/x-icon">
+  <link rel="icon" href="assets/beer-keg.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/beer-keg.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Main header -->
+    <header class="main-header">
+      <span id="temp" class="temp"></span>
+      <h1 id="brand">KegLevel Pico</h1>
+      <span class="demo-badge">DEMO</span>
+      <button class="btn-batchflow" id="btn-batchflow">BatchFlow</button>
+    </header>
+    <input type="hidden" id="pico-ip" />
+
+    <!-- Top navigation -->
+    <nav class="top-nav">
+      <button id="btn-nav-taps" class="nav-btn active">TAPS</button>
+      <button id="btn-nav-kegs" class="nav-btn">KEGS</button>
+      <button id="btn-nav-beverages" class="nav-btn">BEVERAGES</button>
+      <button id="btn-nav-settings" class="nav-btn">SETTINGS</button>
+      <button class="help-btn" title="Help">?</button>
+    </nav>
+
+    <!-- Dashboard screen -->
+    <main id="dashboard-screen" class="screen">
+      <div class="tap-grid" id="tap-grid"><!-- Tap cards rendered by JS --></div>
+    </main>
+
+    <!-- Kegs screen -->
+    <main id="kegs-screen" class="screen hidden">
+      <header class="screen-header">
+        <h2>Kegs</h2>
+      </header>
+      <div class="sub-action-bar">
+        <button id="btn-add-keg" class="sub-btn sub-btn-green">+ ADD NEW</button>
+      </div>
+      <div class="screen-content">
+        <div class="list-header list-header-kegs">
+          <span>Keg Name</span>
+          <span>Contents</span>
+          <span>Tap</span>
+          <span>Actions</span>
+        </div>
+        <div id="keg-list" class="list-body"><!-- Rendered by JS --></div>
+      </div>
+    </main>
+
+    <!-- Beverages screen -->
+    <main id="beverages-screen" class="screen hidden">
+      <header class="screen-header">
+        <h2>Beverages</h2>
+      </header>
+      <div class="sub-action-bar">
+        <button id="btn-add-beverage" class="sub-btn sub-btn-green">+ ADD NEW</button>
+      </div>
+      <div class="screen-content">
+        <div class="list-header list-header-bevs">
+          <span>Beverage Name</span>
+          <span>ABV</span>
+          <span>IBU</span>
+          <span>SRM</span>
+          <span>Actions</span>
+        </div>
+        <div id="beverage-list" class="list-body"><!-- Rendered by JS --></div>
+      </div>
+    </main>
+
+    <!-- Edit modals -->
+    <div id="modal-keg" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-loading-overlay"><div class="modal-loading-spinner"></div></div>
+        <h3 id="modal-keg-title">Edit Keg</h3>
+        <form id="form-keg">
+          <input type="hidden" id="keg-id" />
+          <label>Name</label>
+          <p id="keg-name-readonly" class="keg-name-readonly"></p>
+          <label>Beverage</label>
+          <select id="keg-beverage"></select>
+          <div class="keg-form-row">
+            <div class="keg-field">
+              <label>Empty (Tare) (kg)</label>
+              <input type="number" id="keg-tare" min="0" max="20" step="0.1" value="4.5" inputmode="decimal" />
+            </div>
+            <div class="keg-field">
+              <label>Max Capacity (L)</label>
+              <input type="number" id="keg-max-capacity" min="0" max="60" step="0.1" value="19" inputmode="decimal" />
+            </div>
+          </div>
+          <div class="keg-form-row">
+            <div class="keg-field">
+              <label>Total Weight (kg)</label>
+              <input type="number" id="keg-total-weight" min="0" max="80" step="0.1" value="23.5" inputmode="decimal" />
+            </div>
+            <div class="keg-field">
+              <label>Volume at Fill <span class="calc-hint">(calc @ 1.014 SG)</span></label>
+              <p id="keg-volume-at-fill" class="keg-calc-readonly">0.00 L</p>
+            </div>
+          </div>
+          <label>Tap</label>
+          <select id="keg-tap">
+            <option value="-1">Unassigned</option>
+            <option value="0">Tap 1</option>
+            <option value="1">Tap 2</option>
+            <option value="2">Tap 3</option>
+            <option value="3">Tap 4</option>
+            <option value="4">Tap 5</option>
+          </select>
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel">Cancel</button>
+            <button type="submit" class="btn-save">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="modal-beverage" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-loading-overlay"><div class="modal-loading-spinner"></div></div>
+        <h3 id="modal-beverage-title">Edit Beverage</h3>
+        <form id="form-beverage">
+          <input type="hidden" id="bev-id" />
+          <label>Name</label>
+          <input type="text" id="bev-name" required placeholder="American IPA" />
+          <label>ABV</label>
+          <input type="number" id="bev-abv" min="0" max="20" step="0.1" placeholder="6.5" />
+          <label>IBU</label>
+          <input type="number" id="bev-ibu" min="0" max="120" step="1" placeholder="55" />
+          <label>Color (SRM)</label>
+          <div class="bev-srm-row">
+            <input type="number" id="bev-srm" min="0" max="40" step="1" placeholder="5" inputmode="numeric" />
+            <div id="bev-srm-swatch" class="bev-srm-swatch" title="Beer color preview"></div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel">Cancel</button>
+            <button type="submit" class="btn-save">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Select Keg for Tap modal -->
+    <div id="modal-tap-select" class="modal hidden">
+      <div class="modal-content modal-tap-select">
+        <div class="modal-loading-overlay"><div class="modal-loading-spinner"></div></div>
+        <h3 id="tap-select-title">Select Keg for Tap 1</h3>
+        <div id="tap-select-list" class="tap-select-list"></div>
+        <button id="tap-select-cancel" class="btn-cancel tap-select-cancel">Cancel</button>
+      </div>
+    </div>
+
+
+    <!-- Mark Empty sub-modal -->
+    <div id="modal-mark-empty" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-loading-overlay"><div class="modal-loading-spinner"></div></div>
+        <h3>Mark Keg Empty</h3>
+        <p>Zero this keg's volume and assign Empty?</p>
+        <p id="mark-empty-keg-name" class="keg-name-highlight"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="mark-empty-cancel">Cancel</button>
+          <button type="button" class="btn-save" id="mark-empty-confirm">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings screen -->
+    <main id="settings-screen" class="screen hidden">
+      <header class="settings-header">
+        <h2>Settings</h2>
+      </header>
+      <div class="settings-tabs">
+        <button class="settings-tab-btn active" data-settings-tab="system">SYSTEM</button>
+        <button class="settings-tab-btn" data-settings-tab="alerts">ALERTS</button>
+        <button class="settings-tab-btn" data-settings-tab="updates">UPDATES</button>
+        <button class="settings-tab-btn" data-settings-tab="about">ABOUT</button>
+      </div>
+      <div id="settings-sub-actions" class="sub-action-bar hidden">
+      </div>
+      <div class="settings-content">
+        <!-- SYSTEM tab -->
+        <div id="settings-system" class="settings-pane active">
+          <div class="system-section">
+            <div class="system-row">
+              <label for="active-taps">Active Taps</label>
+              <select id="active-taps" title="Number of active taps">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5" selected>5</option>
+              </select>
+            </div>
+            <div class="system-row">
+              <label for="units">Units</label>
+              <select id="units" title="Volume display units">
+                <option value="metric" selected>L (Metric)</option>
+                <option value="imperial">Gal (Imperial)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <!-- ALERTS tab -->
+        <div id="settings-alerts" class="settings-pane">
+          <div class="demo-notice">Alerts are not available in demo mode.</div>
+        </div>
+        <!-- UPDATES tab -->
+        <div id="settings-updates" class="settings-pane">
+          <div class="demo-notice">OTA updates are not available in demo mode.</div>
+        </div>
+        <!-- ABOUT tab -->
+        <div id="settings-about" class="settings-pane">
+          <div class="about-section">
+            <h3>KegLevel Brands</h3>
+            <p>KettleBrain(c), FermVault(c), KegLevel(c), BatchFlow(c), and TempMonitor(c) names, texts, UI/UX and program code are copyrighted. This material and all components of this program are protected by copyright law. Unauthorized use, duplication, or distribution is strictly prohibited.</p>
+          </div>
+          <div class="about-section about-support-row">
+            <div>
+              <h3>Support This App</h3>
+              <p>This App took hundreds of hours to develop, test, and optimize. Please consider supporting this App with a donation so continuous improvements can be made. If you wish to receive customer support via email, please make a reasonable donation. Customer support requests without a donation may not be considered.</p>
+            </div>
+            <img src="assets/support.gif" alt="Support" class="about-support-img" />
+          </div>
+          <div class="about-section">
+            <h3>Acknowledgements</h3>
+            <p>Icons created by Pixel Perfect - Flaticon<br><a href="https://www.flaticon.com/free-icons/update" target="_blank" rel="noopener">https://www.flaticon.com/free-icons/update</a></p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+
+
+    <!-- Beverage in-use info modal -->
+    <div id="modal-bev-in-use" class="modal hidden">
+      <div class="modal-content modal-confirm">
+        <p id="bev-in-use-text"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn-save" id="btn-bev-in-use-ok">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm delete modal -->
+    <div id="modal-confirm" class="modal hidden">
+      <div class="modal-content modal-confirm">
+        <p id="modal-confirm-text">Are you sure?</p>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel">Cancel</button>
+          <button type="button" id="btn-confirm-delete" class="btn-delete">Delete</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script src="mock-api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

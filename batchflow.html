@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BatchFlow Demo</title>
+  <link rel="icon" href="assets/batchflow.ico" type="image/x-icon" />
+  <link rel="icon" href="assets/batchflow.png" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="assets/batchflow.png" />
+  <link rel="stylesheet" href="batchflow.css" />
+</head>
+<body>
+
+  <!-- Title bar -->
+  <header class="bf-header">
+    <h1 class="bf-title">BatchFlow</h1>
+    <span class="demo-badge">DEMO</span>
+    <button class="bf-help-btn" id="btn-help" title="Help">?</button>
+  </header>
+
+
+  <!-- Column board -->
+  <main class="bf-board" id="board">
+    <!-- Columns rendered by JS -->
+  </main>
+
+  <!-- Trash dock (visible during drag) -->
+  <div class="bf-trash" id="trash-dock">
+    <span class="bf-trash-label">Remove</span>
+  </div>
+
+  <!-- Help overlay -->
+  <div class="bf-overlay" id="help-overlay" style="display:none;">
+    <div class="bf-overlay-content">
+      <div class="bf-overlay-header">
+        <h2>BatchFlow Help</h2>
+        <button class="bf-overlay-close" id="btn-help-close">&times;</button>
+      </div>
+      <div class="bf-overlay-body" id="help-body">
+        <h3>Getting Started</h3>
+        <p>BatchFlow is a brewing workflow board. Organize your batches across four stages:</p>
+        <ul>
+          <li><strong>Rotation</strong> &mdash; recipes you brew regularly</li>
+          <li><strong>On Deck</strong> &mdash; next up to brew</li>
+          <li><strong>Fermenting</strong> &mdash; currently in the fermenter</li>
+          <li><strong>Finishing</strong> &mdash; conditioning, lagering, or carbonating</li>
+        </ul>
+
+        <h3>Adding Batches</h3>
+        <p>Click <strong>+ Add Batch</strong> at the top of any column to select a beverage from your library. If the beverage doesn't exist yet, click <strong>+ New Beverage</strong> to create one.</p>
+
+        <h3>Moving Batches</h3>
+        <p>Drag a batch card from one column to another. Drop it between existing cards to control the order. You can also drag to the red <strong>Remove</strong> dock at the bottom to remove a batch from the board.</p>
+
+        <h3>Columns</h3>
+        <p>Click a column header to collapse or expand it. Double-click the header to rename the column.</p>
+
+        <h3>Editing Beverages</h3>
+        <p>Click the pencil icon on a batch card to edit the beverage details (name, ABV, IBU, SRM). Changes are saved to the Pico and reflected everywhere.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm remove dialog -->
+  <div class="bf-overlay" id="confirm-overlay" style="display:none;">
+    <div class="bf-confirm-dialog">
+      <p id="confirm-msg">Remove this batch?</p>
+      <div class="bf-confirm-buttons">
+        <button class="bf-btn bf-btn-cancel" id="btn-confirm-cancel">CANCEL</button>
+        <button class="bf-btn bf-btn-danger" id="btn-confirm-ok">REMOVE</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="mock-api.js"></script>
+  <script src="batchflow.js"></script>
+</body>
+</html>
