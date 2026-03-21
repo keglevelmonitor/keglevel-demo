@@ -1297,6 +1297,7 @@ async function saveCalibration() {
     calState.deductInventory = document.getElementById('cal-deduct-inventory')?.checked ?? true;
     calSaveDeduct(calState.deductInventory);
     await apiFetch('/api/calibration/reset', { method: 'POST' });
+    calSetReady();
     initCalibrationTab();
   } catch (e) {
     alert('Failed to save: ' + (e?.message || e));
