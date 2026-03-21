@@ -182,8 +182,12 @@
         <button class="settings-tab-btn" data-settings-tab="alerts">ALERTS</button>
         <button class="settings-tab-btn" data-settings-tab="updates">UPDATES</button>
         <button class="settings-tab-btn" data-settings-tab="about">ABOUT</button>
+        <button class="settings-tab-btn" data-settings-tab="calibration">CALIBRATION</button>
       </div>
       <div id="settings-sub-actions" class="sub-action-bar hidden">
+        <button id="settings-cal-save" class="sub-btn hidden" disabled>SAVE CALIBRATION</button>
+        <button id="settings-cal-reset" class="sub-btn hidden">RESET PULSES</button>
+        <button id="settings-cal-default" class="sub-btn hidden" disabled>SET TO DEFAULT</button>
       </div>
       <div class="settings-content">
         <!-- SYSTEM tab -->
@@ -234,10 +238,62 @@
             <p>Icons created by Pixel Perfect - Flaticon<br><a href="https://www.flaticon.com/free-icons/update" target="_blank" rel="noopener">https://www.flaticon.com/free-icons/update</a></p>
           </div>
         </div>
+        <!-- CALIBRATION tab -->
+        <div id="settings-calibration" class="settings-pane">
+          <p class="cal-instructions" id="cal-instructions">Select a tap for calibration. Pour only from that tap.</p>
+          <div class="cal-tap-buttons" id="cal-tap-buttons"></div>
+          <div class="cal-main">
+            <label>Measured Volume</label>
+            <div class="cal-volume-row">
+              <button type="button" id="cal-vol-minus" class="btn-cal-adjust">−</button>
+              <input type="range" id="cal-vol-slider" min="0" max="1000" step="10" value="0" />
+              <button type="button" id="cal-vol-plus" class="btn-cal-adjust">+</button>
+            </div>
+            <span id="cal-vol-display">0 mL</span>
+            <div class="cal-data-row">
+              <div class="cal-data-block">
+                <label>Pulses</label>
+                <span id="cal-pulses" class="cal-pulses">0</span>
+              </div>
+              <div class="cal-data-block">
+                <label>New K-Factor</label>
+                <input type="number" id="cal-k-input" min="100" value="5100" disabled />
+              </div>
+              <div class="cal-data-block">
+                <label>Current K-Factor</label>
+                <span id="cal-current-k" class="cal-current-k">—</span>
+              </div>
+            </div>
+            <label class="cal-checkbox-label">
+              <input type="checkbox" id="cal-deduct-inventory" />
+              Deduct volume from Inventory?
+            </label>
+          </div>
+        </div>
       </div>
     </main>
 
-
+    <!-- Calibrate sub-modal (Keg Kicked) -->
+    <div id="modal-calibrate" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-loading-overlay"><div class="modal-loading-spinner"></div></div>
+        <h3 id="calibrate-title">Calibration Data</h3>
+        <div class="calibrate-grid">
+          <span>Starting Volume:</span><span id="cal-start-vol">—</span>
+          <span>Total Pulses:</span><span id="cal-total-pulses">—</span>
+          <span>Current K-Factor:</span><span id="cal-old-k">—</span>
+          <span class="cal-new-label">CALCULATED NEW K-FACTOR:</span><span id="cal-new-k" class="cal-new-value">—</span>
+        </div>
+        <label class="cal-confirm-label">
+          <input type="checkbox" id="cal-confirm-chk" />
+          This keg is empty and was fully dispensed from this tap.
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="cal-cancel">Cancel</button>
+          <button type="button" class="btn-save" id="cal-save">SAVE CALIBRATION & RESET</button>
+        </div>
+      </div>
+    </div>
 
     <!-- Beverage in-use info modal -->
     <div id="modal-bev-in-use" class="modal hidden">

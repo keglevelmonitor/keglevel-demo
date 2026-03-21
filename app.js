@@ -484,6 +484,7 @@ function setActiveSettingsTab(tabId) {
 }
 
 function initSettingsTab(tabId) {
+  if (tabId === 'calibration') initCalibrationTab();
 }
 
 async function loadAlertsConfig() {
@@ -1721,7 +1722,7 @@ function closeTapSelector() {
 async function selectKegForTap(tapIndex, kegId, modal) {
   if (kegId === KEG_KICKED_ID) {
     modal.classList.add('hidden');
-    alert('Calibration is not available in demo mode.');
+    openCalibrateModal(tapIndex);
     return;
   }
   if (kegId === KEG_MARK_EMPTY_ID) {
@@ -2110,5 +2111,46 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.settings-tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => setActiveSettingsTab(btn.dataset.settingsTab));
   });
+  document.getElementById('settings-cal-default').addEventListener('click', setCalToDefault);
+  document.getElementById('settings-cal-reset').addEventListener('click', resetCalibration);
+  document.getElementById('settings-cal-save').addEventListener('click', saveCalibration);
+  document.getElementById('cal-tap-buttons')?.addEventListener('click', (e) => {
+    const tapBtn = e.target.closest('.cal-tap-btn');
+    const pourBtn = e.target.closest('.cal-pour-btn');
+    if (tapBtn) {
+      calSelectTap(parseInt(tapBtn.dataset.tapIndex, 10));
+      return;
+    }
+    if (pourBtn) {
+      const ti = parseInt(pourBtn.dataset.tapIndex, 10);
+      const liters = pourBtn.classList.contains('cal-pour-continuous') ? 0.25 : parseFloat(pourBtn.dataset.liters) || 0.5;
+      const continuous = pourBtn.classList.contains('cal-pour-continuous');
+      calPour(ti, liters, continuous);
+    }
+  });
+  document.getElementById('cal-vol-slider').addEventListener('input', () => {
+    calUpdateVolumeDisplay();
+    calRender();
+  });
+  document.getElementById('cal-vol-minus').addEventListener('click', () => {
+    const el = document.getElementById('cal-vol-slider');
+    const step = getUnits() === 'metric' ? 10 : 0.1;
+    el.value = Math.max(0, (parseFloat(el.value) || 0) - step);
+    calUpdateVolumeDisplay();
+    calRender();
+  });
+  document.getElementById('cal-vol-plus').addEventListener('click', () => {
+    const el = document.getElementById('cal-vol-slider');
+    const step = getUnits() === 'metric' ? 10 : 0.1;
+    const max = getUnits() === 'metric' ? 1000 : 32;
+    el.value = Math.min(max, (parseFloat(el.value) || 0) + step);
+    calUpdateVolumeDisplay();
+    calRender();
+  });
+  document.getElementById('cal-cancel').addEventListener('click', () => {
+    document.getElementById('modal-calibrate').classList.add('hidden');
+    openTapSelector(calibrateTapIndex);
+  });
+  document.getElementById('cal-save').addEventListener('click', commitCalibration);
   initInventory();
 });
