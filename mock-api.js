@@ -1,11 +1,15 @@
 /**
  * KegLevel Demo — Mock API Layer
  * Intercepts all fetch() calls to /api/* and returns in-memory mock responses.
+ * State is persisted to localStorage so it survives refreshes and is shared
+ * across pages (main app + BatchFlow) on the same origin.
  * Loaded before app.js so the override is in place when the app boots.
  */
 "use strict";
 
 (function () {
+  const STORE_KEY = "keglevel_demo_state";
+
   /* ------------------------------------------------------------------ */
   /*  UUID helper                                                        */
   /* ------------------------------------------------------------------ */
@@ -17,95 +21,78 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /*  Pre-loaded beverages                                               */
+  /*  Default data (used on first visit or after reset)                  */
   /* ------------------------------------------------------------------ */
-  const beverages = [
-    { id: uuid(), name: "Hazy Horizon IPA",    style: "New England IPA",  abv: 6.8, ibu: 45, srm: 6  },
-    { id: uuid(), name: "West Coast Crusher",  style: "West Coast IPA",   abv: 7.2, ibu: 65, srm: 8  },
-    { id: uuid(), name: "Midnight Oat Stout",  style: "Oatmeal Stout",    abv: 5.4, ibu: 30, srm: 35 },
-    { id: uuid(), name: "Bavarian Sun Hefe",   style: "Hefeweizen",       abv: 4.9, ibu: 12, srm: 4  },
-    { id: uuid(), name: "Crisp Lager",         style: "Pilsner",          abv: 4.5, ibu: 28, srm: 3  },
-  ];
+  function createDefaults() {
+    const bevs = [
+      { id: uuid(), name: "Hazy Horizon IPA",    style: "New England IPA",  abv: 6.8, ibu: 45, srm: 6  },
+      { id: uuid(), name: "West Coast Crusher",  style: "West Coast IPA",   abv: 7.2, ibu: 65, srm: 8  },
+      { id: uuid(), name: "Midnight Oat Stout",  style: "Oatmeal Stout",    abv: 5.4, ibu: 30, srm: 35 },
+      { id: uuid(), name: "Bavarian Sun Hefe",   style: "Hefeweizen",       abv: 4.9, ibu: 12, srm: 4  },
+      { id: uuid(), name: "Crisp Lager",         style: "Pilsner",          abv: 4.5, ibu: 28, srm: 3  },
+    ];
+    const kgs = [
+      { id: uuid(), name: "Keg 01", title: "Keg 01", beverage_id: bevs[0].id, beverage_name: bevs[0].name, style: bevs[0].style, abv: bevs[0].abv, starting_volume_liters: 18.93, maximum_full_volume_liters: 18.93, tare_weight_kg: 7.0, starting_total_weight_kg: 26.2, current_dispensed_liters: 4.73, total_dispensed_pulses: 24123, tap_index: 0, tapped_date: "2026-03-01", fill_date: "2026-02-28", notes: "" },
+      { id: uuid(), name: "Keg 02", title: "Keg 02", beverage_id: bevs[1].id, beverage_name: bevs[1].name, style: bevs[1].style, abv: bevs[1].abv, starting_volume_liters: 9.46, maximum_full_volume_liters: 9.46, tare_weight_kg: 3.6, starting_total_weight_kg: 13.2, current_dispensed_liters: 2.66, total_dispensed_pulses: 13566, tap_index: 1, tapped_date: "2026-03-05", fill_date: "2026-03-04", notes: "" },
+      { id: uuid(), name: "Keg 03", title: "Keg 03", beverage_id: bevs[2].id, beverage_name: bevs[2].name, style: bevs[2].style, abv: bevs[2].abv, starting_volume_liters: 18.93, maximum_full_volume_liters: 18.93, tare_weight_kg: 7.0, starting_total_weight_kg: 26.2, current_dispensed_liters: 14.23, total_dispensed_pulses: 72573, tap_index: 2, tapped_date: "2026-02-15", fill_date: "2026-02-14", notes: "" },
+      { id: uuid(), name: "Keg 04", title: "Keg 04", beverage_id: bevs[3].id, beverage_name: bevs[3].name, style: bevs[3].style, abv: bevs[3].abv, starting_volume_liters: 18.93, maximum_full_volume_liters: 18.93, tare_weight_kg: 4.0, starting_total_weight_kg: 23.2, current_dispensed_liters: 1.89, total_dispensed_pulses: 9639, tap_index: 3, tapped_date: "2026-03-10", fill_date: "2026-03-09", notes: "" },
+      { id: uuid(), name: "Keg 05", title: "Keg 05", beverage_id: bevs[4].id, beverage_name: bevs[4].name, style: bevs[4].style, abv: bevs[4].abv, starting_volume_liters: 9.46, maximum_full_volume_liters: 9.46, tare_weight_kg: 3.6, starting_total_weight_kg: 13.2, current_dispensed_liters: 7.06, total_dispensed_pulses: 36006, tap_index: 4, tapped_date: "2026-02-20", fill_date: "2026-02-19", notes: "" },
+    ];
+    const cfg = {
+      k_factors: [5100, 5100, 5100, 5100, 5100],
+      active_taps: 5,
+      tap_labels: ["Tap 1", "Tap 2", "Tap 3", "Tap 4", "Tap 5"],
+      mdns_hostname: "keglevel",
+    };
+    const bf = {
+      columns: {
+        on_rotation: [bevs[0].id, bevs[1].id],
+        on_deck: [bevs[4].id],
+        fermenting: [bevs[3].id],
+        lagering_or_finishing: [bevs[2].id],
+      },
+      titles: { rotation: "On Rotation", deck: "On Deck", fermenting: "Fermenting", finishing: "Lagering / Finishing" },
+      collapsed: {},
+    };
+    return { beverages: bevs, kegs: kgs, config: cfg, batchflow: bf };
+  }
 
   /* ------------------------------------------------------------------ */
-  /*  Pre-loaded kegs (each assigned to a tap)                           */
+  /*  localStorage persistence                                          */
   /* ------------------------------------------------------------------ */
-  const kegs = [
-    {
-      id: uuid(), name: "Keg 01", title: "Keg 01",
-      beverage_id: beverages[0].id, beverage_name: beverages[0].name,
-      style: beverages[0].style, abv: beverages[0].abv,
-      starting_volume_liters: 18.93, maximum_full_volume_liters: 18.93,
-      tare_weight_kg: 7.0, starting_total_weight_kg: 26.2,
-      current_dispensed_liters: 4.73, total_dispensed_pulses: 24123,
-      tap_index: 0, tapped_date: "2026-03-01", fill_date: "2026-02-28", notes: "",
-    },
-    {
-      id: uuid(), name: "Keg 02", title: "Keg 02",
-      beverage_id: beverages[1].id, beverage_name: beverages[1].name,
-      style: beverages[1].style, abv: beverages[1].abv,
-      starting_volume_liters: 9.46, maximum_full_volume_liters: 9.46,
-      tare_weight_kg: 3.6, starting_total_weight_kg: 13.2,
-      current_dispensed_liters: 2.66, total_dispensed_pulses: 13566,
-      tap_index: 1, tapped_date: "2026-03-05", fill_date: "2026-03-04", notes: "",
-    },
-    {
-      id: uuid(), name: "Keg 03", title: "Keg 03",
-      beverage_id: beverages[2].id, beverage_name: beverages[2].name,
-      style: beverages[2].style, abv: beverages[2].abv,
-      starting_volume_liters: 18.93, maximum_full_volume_liters: 18.93,
-      tare_weight_kg: 7.0, starting_total_weight_kg: 26.2,
-      current_dispensed_liters: 14.23, total_dispensed_pulses: 72573,
-      tap_index: 2, tapped_date: "2026-02-15", fill_date: "2026-02-14", notes: "",
-    },
-    {
-      id: uuid(), name: "Keg 04", title: "Keg 04",
-      beverage_id: beverages[3].id, beverage_name: beverages[3].name,
-      style: beverages[3].style, abv: beverages[3].abv,
-      starting_volume_liters: 18.93, maximum_full_volume_liters: 18.93,
-      tare_weight_kg: 4.0, starting_total_weight_kg: 23.2,
-      current_dispensed_liters: 1.89, total_dispensed_pulses: 9639,
-      tap_index: 3, tapped_date: "2026-03-10", fill_date: "2026-03-09", notes: "",
-    },
-    {
-      id: uuid(), name: "Keg 05", title: "Keg 05",
-      beverage_id: beverages[4].id, beverage_name: beverages[4].name,
-      style: beverages[4].style, abv: beverages[4].abv,
-      starting_volume_liters: 9.46, maximum_full_volume_liters: 9.46,
-      tare_weight_kg: 3.6, starting_total_weight_kg: 13.2,
-      current_dispensed_liters: 7.06, total_dispensed_pulses: 36006,
-      tap_index: 4, tapped_date: "2026-02-20", fill_date: "2026-02-19", notes: "",
-    },
-  ];
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s.beverages && s.kegs && s.config && s.batchflow) return s;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        beverages: beverages,
+        kegs: kegs,
+        config: config,
+        batchflow: batchflow,
+      }));
+    } catch (_) {}
+  }
 
   /* ------------------------------------------------------------------ */
-  /*  Config                                                             */
+  /*  Initialize state (from localStorage or defaults)                   */
   /* ------------------------------------------------------------------ */
-  const config = {
-    k_factors: [5100, 5100, 5100, 5100, 5100],
-    active_taps: 5,
-    tap_labels: ["Tap 1", "Tap 2", "Tap 3", "Tap 4", "Tap 5"],
-    mdns_hostname: "keglevel",
-  };
+  const saved = loadState();
+  const defaults = saved || createDefaults();
+  const beverages = defaults.beverages;
+  const kegs = defaults.kegs;
+  const config = defaults.config;
+  let batchflow = defaults.batchflow;
 
-  /* ------------------------------------------------------------------ */
-  /*  BatchFlow workflow                                                 */
-  /* ------------------------------------------------------------------ */
-  let batchflow = {
-    columns: {
-      on_rotation: [beverages[0].id, beverages[1].id],
-      on_deck: [beverages[4].id],
-      fermenting: [beverages[3].id],
-      lagering_or_finishing: [beverages[2].id],
-    },
-    titles: {
-      rotation: "On Rotation",
-      deck: "On Deck",
-      fermenting: "Fermenting",
-      finishing: "Lagering / Finishing",
-    },
-    collapsed: {},
-  };
+  if (!saved) persist();
 
   /* ------------------------------------------------------------------ */
   /*  Temperature simulation                                             */
@@ -216,6 +203,7 @@
     }
     if (method === "PUT" && path === "/api/config") {
       Object.assign(config, body);
+      persist();
       return ok({ status: "ok", config: Object.assign({}, config) });
     }
 
@@ -247,6 +235,7 @@
       keg.name = autoName;
       keg.title = autoName;
       kegs.push(keg);
+      persist();
       return ok(keg, 201);
     }
 
@@ -257,11 +246,13 @@
       if (method === "GET") return ok(Object.assign({}, keg));
       if (method === "PUT") {
         Object.assign(keg, body);
+        persist();
         return ok(Object.assign({}, keg));
       }
       if (method === "DELETE") {
         const idx = kegs.indexOf(keg);
         if (idx >= 0) kegs.splice(idx, 1);
+        persist();
         return ok({ status: "ok", deleted: kegMatch[1] });
       }
     }
@@ -276,6 +267,7 @@
         body
       );
       beverages.push(bev);
+      persist();
       return ok(bev, 201);
     }
 
@@ -286,11 +278,13 @@
       if (method === "GET") return ok(Object.assign({}, bev));
       if (method === "PUT") {
         Object.assign(bev, body);
+        persist();
         return ok(Object.assign({}, bev));
       }
       if (method === "DELETE") {
         const idx = beverages.indexOf(bev);
         if (idx >= 0) beverages.splice(idx, 1);
+        persist();
         return ok({ status: "ok", deleted: bevMatch[1] });
       }
     }
@@ -325,6 +319,7 @@
       }
       if (body.label !== undefined) config.tap_labels[ti] = body.label;
       if (body.k_factor !== undefined) config.k_factors[ti] = body.k_factor;
+      persist();
       return ok({ status: "ok", tap: ti });
     }
 
@@ -340,6 +335,7 @@
         keg.current_dispensed_liters += actual;
         keg.total_dispensed_pulses += Math.round(actual * (config.k_factors[ti] || 5100));
         pouringUntil[ti] = Date.now() + 1500;
+        persist();
       }
       return ok({ status: "ok", tap: ti, adjusted_liters: liters });
     }
@@ -349,6 +345,7 @@
     if (tapReset && method === "POST") {
       const ti = parseInt(tapReset[1], 10);
       kegs.forEach((k) => { if (k.tap_index === ti) k.tap_index = -1; });
+      persist();
       return ok({ status: "ok", tap: ti });
     }
 
@@ -358,6 +355,7 @@
     }
     if (method === "PUT" && path === "/api/batchflow") {
       batchflow = body;
+      persist();
       return ok({ status: "ok" });
     }
 
@@ -434,5 +432,5 @@
     });
   };
 
-  console.log("%c[KegLevel Demo] Mock API active", "color:#ffc107;font-weight:bold");
+  console.log("%c[KegLevel Demo] Mock API active — state persisted to localStorage", "color:#ffc107;font-weight:bold");
 })();
