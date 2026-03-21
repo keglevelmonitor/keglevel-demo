@@ -16,7 +16,7 @@
       <span id="temp" class="temp"></span>
       <span class="demo-badge demo-badge-left">DEMO</span>
       <h1 id="brand">KegLevel Pico</h1>
-      <span class="demo-badge demo-badge-right">DEMO</span>
+      <a class="btn-purchase demo-badge-right" href="https://keglevelmonitor.github.io/keglevel-demo/purchase.html" target="_blank">BUY NOW</a>
       <button class="btn-batchflow" id="btn-batchflow">BatchFlow</button>
     </header>
     <input type="hidden" id="pico-ip" />
@@ -352,6 +352,26 @@
         <div class="modal-actions">
           <button type="button" class="btn-cancel">Cancel</button>
           <button type="button" id="btn-confirm-delete" class="btn-delete">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo splash modal -->
+    <div id="modal-demo-splash" class="modal">
+      <div class="modal-content modal-splash">
+        <h3>Welcome to KegLevel Demo</h3>
+        <p>This is a fully interactive demo of the <strong>KegLevel Pico</strong> keg monitoring system. No hardware required.</p>
+        <ul class="splash-list">
+          <li>5 taps pre-loaded with beverages and realistic keg levels</li>
+          <li>Live temperature readings that fluctuate naturally</li>
+          <li>Pour buttons to simulate dispensing and watch levels drop</li>
+          <li>Full inventory management &mdash; add, edit, and delete kegs and beverages</li>
+          <li>BatchFlow brewing workflow board with drag-and-drop</li>
+          <li>Some features (Alerts, Updates, WiFi) are view-only in demo mode</li>
+        </ul>
+        <p class="splash-cta">Interested in the real thing? <a href="https://keglevelmonitor.github.io/keglevel-demo/purchase.html" target="_blank">Learn more &rarr;</a></p>
+        <div class="modal-actions">
+          <button type="button" class="btn-save" id="btn-splash-dismiss">Got It</button>
         </div>
       </div>
     </div>

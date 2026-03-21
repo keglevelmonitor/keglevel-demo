@@ -1344,3 +1344,54 @@ body {
   pointer-events: none;
 }
 
+/* Purchase button in header */
+.btn-purchase {
+  background: #22c55e;
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  position: absolute;
+  z-index: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-purchase:hover {
+  background: #4ade80;
+}
+
+/* Demo splash modal */
+.modal-splash {
+  max-width: 480px;
+}
+.modal-splash h3 {
+  text-align: center;
+}
+.splash-list {
+  margin: 12px 0 16px 0;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #ccc;
+}
+.splash-cta {
+  text-align: center;
+  font-size: 13px;
+  color: #aaa;
+  margin-top: 8px;
+}
+.splash-cta a {
+  color: #22c55e;
+  text-decoration: none;
+  font-weight: 600;
+}
+.splash-cta a:hover {
+  text-decoration: underline;
+}
+.modal-splash .modal-actions {
+  justify-content: center;
+}
+

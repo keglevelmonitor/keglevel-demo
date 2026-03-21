@@ -2154,5 +2154,17 @@ document.addEventListener('DOMContentLoaded', () => {
     openTapSelector(calibrateTapIndex);
   });
   document.getElementById('cal-save').addEventListener('click', commitCalibration);
+
+  const splashModal = document.getElementById('modal-demo-splash');
+  if (splashModal && !sessionStorage.getItem('keglevel_demo_splash_seen')) {
+    splashModal.classList.remove('hidden');
+    document.getElementById('btn-splash-dismiss').addEventListener('click', () => {
+      splashModal.classList.add('hidden');
+      sessionStorage.setItem('keglevel_demo_splash_seen', '1');
+    });
+  } else if (splashModal) {
+    splashModal.classList.add('hidden');
+  }
+
   initInventory();
 });
