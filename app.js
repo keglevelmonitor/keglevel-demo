@@ -1686,7 +1686,8 @@ async function openTapSelector(tapIndex) {
   (kegs || [])
     .sort((a, b) => (a.title || a.name || '').localeCompare(b.title || b.name || ''))
     .forEach((keg) => {
-      const kegTapIdx = parseInt(keg.tap_index, 10) || -1;
+      const rawIdx = parseInt(keg.tap_index, 10);
+      const kegTapIdx = Number.isNaN(rawIdx) ? -1 : rawIdx;
       const unassigned = kegTapIdx === -1;
       const onThisTap = kegTapIdx === tapIndex;
       if (unassigned || onThisTap) {
