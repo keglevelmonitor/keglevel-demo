@@ -185,6 +185,11 @@
         <button class="settings-tab-btn" data-settings-tab="calibration">CALIBRATION</button>
       </div>
       <div id="settings-sub-actions" class="sub-action-bar hidden">
+        <button id="settings-alerts-test" class="sub-btn hidden" disabled>TEST SEND</button>
+        <button id="settings-alerts-save" class="sub-btn hidden" disabled>SAVE</button>
+        <button id="settings-check" class="sub-btn hidden" disabled>CHECK</button>
+        <button id="settings-install" class="sub-btn hidden" disabled>INSTALL</button>
+        <button id="settings-restart" class="sub-btn sub-btn-reload hidden" disabled>RELOAD</button>
         <button id="settings-cal-save" class="sub-btn hidden" disabled>SAVE CALIBRATION</button>
         <button id="settings-cal-reset" class="sub-btn hidden">RESET PULSES</button>
         <button id="settings-cal-default" class="sub-btn hidden" disabled>SET TO DEFAULT</button>
@@ -210,15 +215,50 @@
                 <option value="imperial">Gal (Imperial)</option>
               </select>
             </div>
+            <div class="wifi-mode-section demo-disabled">
+              <label>Change how the Pico web page is accessed:</label>
+              <div class="wifi-mode-buttons">
+                <button id="btn-enable-wifi" class="btn-wifi-reset" disabled>Enable WiFi Mode</button>
+                <button id="btn-enable-standalone" class="btn-wifi-reset" disabled>Enable Standalone Mode</button>
+              </div>
+            </div>
           </div>
         </div>
         <!-- ALERTS tab -->
-        <div id="settings-alerts" class="settings-pane">
-          <div class="demo-notice">Alerts are not available in demo mode.</div>
+        <div id="settings-alerts" class="settings-pane demo-disabled">
+          <div class="alerts-section">
+            <h3>Push Notifications (via mailgun.com)</h3>
+            <label>Alert Frequency</label>
+            <select id="alerts-frequency" disabled>
+              <option value="daily" selected>Daily</option>
+            </select>
+            <label>Mailgun API Key</label>
+            <input type="password" id="alerts-api-key" value="key-demo1234567890" disabled />
+            <label>Mailgun Domain</label>
+            <input type="text" id="alerts-domain" value="sandbox.mailgun.org" disabled />
+            <label>From Email</label>
+            <input type="email" id="alerts-from" value="keglevel@sandbox.mailgun.org" disabled />
+            <label>Recipient Email</label>
+            <input type="email" id="alerts-to" value="brewer@example.com" disabled />
+          </div>
+          <div class="alerts-section">
+            <h3>Conditional Alerts</h3>
+            <label>Low Volume Alert <span id="alerts-low-vol-label">(2.50 L)</span></label>
+            <input type="range" id="alerts-low-vol" min="0" max="5" step="0.25" value="2.5" disabled />
+            <label>Low Temp Alert <span id="alerts-low-temp-label">(33 °F)</span></label>
+            <input type="range" id="alerts-low-temp" min="27" max="45" step="1" value="33" disabled />
+            <label>High Temp Alert <span id="alerts-high-temp-label">(45 °F)</span></label>
+            <input type="range" id="alerts-high-temp" min="0" max="61" step="1" value="45" disabled />
+          </div>
         </div>
         <!-- UPDATES tab -->
-        <div id="settings-updates" class="settings-pane">
-          <div class="demo-notice">OTA updates are not available in demo mode.</div>
+        <div id="settings-updates" class="settings-pane demo-disabled">
+          <p class="updates-version" id="updates-version">Firmware: 1.5.0-demo</p>
+          <p class="updates-note" id="updates-note">Web UI is served from the Pico and updates with firmware.</p>
+          <pre id="updates-log" class="updates-log">Demo connected. If Pico were connected the current firmware revision would be shown here.</pre>
+          <div class="ota-progress-bar">
+            <div class="ota-progress-fill" id="ota-progress-fill"></div>
+          </div>
         </div>
         <!-- ABOUT tab -->
         <div id="settings-about" class="settings-pane">

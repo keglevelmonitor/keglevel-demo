@@ -1339,10 +1339,8 @@ body {
   right: 33%;
   transform: translateX(50%);
 }
-.demo-notice {
-  text-align: center;
-  color: #aaa;
-  padding: 2rem 1rem;
-  font-style: italic;
+.demo-disabled {
+  opacity: 0.45;
+  pointer-events: none;
 }
 
