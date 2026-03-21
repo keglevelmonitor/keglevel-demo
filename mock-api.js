@@ -32,7 +32,7 @@
   /* ------------------------------------------------------------------ */
   const kegs = [
     {
-      id: uuid(), name: "Half Barrel #1", title: "Half Barrel #1",
+      id: uuid(), name: "Keg 01", title: "Keg 01",
       beverage_id: beverages[0].id, beverage_name: beverages[0].name,
       style: beverages[0].style, abv: beverages[0].abv,
       starting_volume_liters: 18.93, maximum_full_volume_liters: 18.93,
@@ -41,7 +41,7 @@
       tap_index: 0, tapped_date: "2026-03-01", fill_date: "2026-02-28", notes: "",
     },
     {
-      id: uuid(), name: "Sixth Barrel #2", title: "Sixth Barrel #2",
+      id: uuid(), name: "Keg 02", title: "Keg 02",
       beverage_id: beverages[1].id, beverage_name: beverages[1].name,
       style: beverages[1].style, abv: beverages[1].abv,
       starting_volume_liters: 9.46, maximum_full_volume_liters: 9.46,
@@ -50,7 +50,7 @@
       tap_index: 1, tapped_date: "2026-03-05", fill_date: "2026-03-04", notes: "",
     },
     {
-      id: uuid(), name: "Half Barrel #3", title: "Half Barrel #3",
+      id: uuid(), name: "Keg 03", title: "Keg 03",
       beverage_id: beverages[2].id, beverage_name: beverages[2].name,
       style: beverages[2].style, abv: beverages[2].abv,
       starting_volume_liters: 18.93, maximum_full_volume_liters: 18.93,
@@ -59,7 +59,7 @@
       tap_index: 2, tapped_date: "2026-02-15", fill_date: "2026-02-14", notes: "",
     },
     {
-      id: uuid(), name: "Corny Keg #4", title: "Corny Keg #4",
+      id: uuid(), name: "Keg 04", title: "Keg 04",
       beverage_id: beverages[3].id, beverage_name: beverages[3].name,
       style: beverages[3].style, abv: beverages[3].abv,
       starting_volume_liters: 18.93, maximum_full_volume_liters: 18.93,
@@ -68,7 +68,7 @@
       tap_index: 3, tapped_date: "2026-03-10", fill_date: "2026-03-09", notes: "",
     },
     {
-      id: uuid(), name: "Sixth Barrel #5", title: "Sixth Barrel #5",
+      id: uuid(), name: "Keg 05", title: "Keg 05",
       beverage_id: beverages[4].id, beverage_name: beverages[4].name,
       style: beverages[4].style, abv: beverages[4].abv,
       starting_volume_liters: 9.46, maximum_full_volume_liters: 9.46,
@@ -134,6 +134,15 @@
 
   function kegById(id) {
     return kegs.find((k) => k.id === id) || null;
+  }
+
+  function nextKegNumber() {
+    let max = 0;
+    kegs.forEach((k) => {
+      const m = (k.name || "").match(/^Keg\s+(\d+)$/);
+      if (m) max = Math.max(max, parseInt(m[1], 10));
+    });
+    return max + 1;
   }
 
   function buildTapState(tapIndex) {
@@ -215,11 +224,13 @@
       return ok(kegs.slice());
     }
     if (method === "POST" && path === "/api/kegs") {
+      const nextNum = nextKegNumber();
+      const autoName = "Keg " + String(nextNum).padStart(2, "0");
       const keg = Object.assign(
         {
           id: uuid(),
-          name: "New Keg",
-          title: "New Keg",
+          name: autoName,
+          title: autoName,
           tap_index: -1,
           current_dispensed_liters: 0,
           total_dispensed_pulses: 0,
@@ -233,6 +244,8 @@
         },
         body
       );
+      keg.name = autoName;
+      keg.title = autoName;
       kegs.push(keg);
       return ok(keg, 201);
     }

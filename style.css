@@ -1326,9 +1326,18 @@ body {
   padding: 2px 8px;
   border-radius: 4px;
   letter-spacing: 1px;
-  margin-left: 8px;
   vertical-align: middle;
   flex-shrink: 0;
+  position: absolute;
+  z-index: 1;
+}
+.demo-badge-left {
+  left: 33%;
+  transform: translateX(-50%);
+}
+.demo-badge-right {
+  right: 33%;
+  transform: translateX(50%);
 }
 .demo-notice {
   text-align: center;
