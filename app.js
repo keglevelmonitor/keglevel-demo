@@ -2113,6 +2113,29 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.settings-tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => setActiveSettingsTab(btn.dataset.settingsTab));
   });
+
+  document.querySelector('.help-btn').addEventListener('click', () => {
+    let anchor = 'toc';
+    const activeNav = document.querySelector('.top-nav .nav-btn.active');
+    if (activeNav) {
+      const id = activeNav.id;
+      if (id === 'btn-nav-taps') anchor = 'taps';
+      else if (id === 'btn-nav-kegs') anchor = 'kegs';
+      else if (id === 'btn-nav-beverages') anchor = 'beverages';
+      else if (id === 'btn-nav-settings') {
+        const tab = document.querySelector('.settings-tab-btn.active');
+        const t = tab ? tab.dataset.settingsTab : '';
+        if (t === 'system') anchor = 'system';
+        else if (t === 'alerts') anchor = 'notifications';
+        else if (t === 'updates') anchor = 'updates';
+        else if (t === 'about') anchor = 'about';
+        else if (t === 'calibration') anchor = 'calibration';
+        else anchor = 'system';
+      }
+    }
+    window.open('help.html#' + anchor, '_blank');
+  });
+
   document.getElementById('settings-cal-default').addEventListener('click', setCalToDefault);
   document.getElementById('settings-cal-reset').addEventListener('click', resetCalibration);
   document.getElementById('settings-cal-save').addEventListener('click', saveCalibration);

@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KegLevel Pico — Help</title>
+  <link rel="icon" href="assets/beer-keg.ico" type="image/x-icon">
+  <link rel="icon" href="assets/beer-keg.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/beer-keg.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    .help-wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    /* Header */
+    .help-header {
+      background: #141414;
+      padding: 0 16px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .help-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffa500;
+    }
+    .help-header .back-link {
+      position: absolute;
+      left: 16px;
+      color: #aaa;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .help-header .back-link:hover { color: #fff; }
+
+    /* TOC */
+    .toc {
+      background: #141414;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin: 28px 0 36px;
+    }
+    .toc h2 {
+      font-size: 18px;
+      color: #ffa500;
+      margin-bottom: 12px;
+    }
+    .toc ol {
+      padding-left: 20px;
+    }
+    .toc li {
+      padding: 4px 0;
+      font-size: 15px;
+    }
+    .toc a {
+      color: #6db3f2;
+      text-decoration: none;
+    }
+    .toc a:hover { text-decoration: underline; }
+    .toc .toc-sub {
+      list-style: none;
+      padding-left: 20px;
+      margin-top: 4px;
+    }
+    .toc .toc-sub li::before {
+      content: "— ";
+      color: #555;
+    }
+
+    /* Sections */
+    .help-section {
+      margin-bottom: 40px;
+      scroll-margin-top: 60px;
+    }
+    .help-section h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffa500;
+      margin-bottom: 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .help-section h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #e0e0e0;
+      margin: 18px 0 8px;
+    }
+    .help-section p {
+      font-size: 15px;
+      line-height: 1.65;
+      color: #ccc;
+      margin-bottom: 10px;
+    }
+    .help-section ul, .help-section ol {
+      padding-left: 22px;
+      margin-bottom: 12px;
+    }
+    .help-section li {
+      font-size: 15px;
+      line-height: 1.65;
+      color: #ccc;
+      padding: 3px 0;
+    }
+    .help-section strong {
+      color: #e0e0e0;
+    }
+    .help-section code {
+      background: #1e1e1e;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 13px;
+      color: #ffc107;
+    }
+    .help-section .note {
+      background: #1a1a2e;
+      border-left: 3px solid #ffc107;
+      padding: 10px 14px;
+      border-radius: 4px;
+      margin: 12px 0;
+      font-size: 14px;
+      color: #ddd;
+    }
+    .help-section table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .help-section th, .help-section td {
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid #222;
+    }
+    .help-section th {
+      color: #ffa500;
+      font-weight: 600;
+    }
+    .back-to-top {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #6db3f2;
+      text-decoration: none;
+    }
+    .back-to-top:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <header class="help-header">
+    <a href="index.html" class="back-link">&larr; Back to App</a>
+    <h1>KegLevel Pico &mdash; Help</h1>
+  </header>
+
+  <div class="help-wrap">
+
+    <!-- Table of Contents -->
+    <nav class="toc" id="toc">
+      <h2>Contents</h2>
+      <ol>
+        <li><a href="#installation">Installation</a></li>
+        <li><a href="#provisioning">Provisioning (Connecting to WiFi)</a></li>
+        <li><a href="#first-time-setup">First Time Setup</a></li>
+        <li><a href="#taps">Taps Screen</a></li>
+        <li><a href="#kegs">Kegs Screen</a></li>
+        <li><a href="#beverages">Beverages Screen</a></li>
+        <li>
+          <a href="#system">Settings</a>
+          <ul class="toc-sub">
+            <li><a href="#system">System</a></li>
+            <li><a href="#notifications">Notifications</a></li>
+            <li><a href="#updates">Updates</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#calibration">Calibration</a></li>
+          </ul>
+        </li>
+        <li><a href="#batchflow">BatchFlow</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+      </ol>
+    </nav>
+
+    <!-- Installation -->
+    <section class="help-section" id="installation">
+      <h2>Installation</h2>
+      <h3>Sensor Placement</h3>
+      <p>Install one flow sensor in each beer line you want to monitor. Place each sensor as close to the <strong>OUT post</strong> (liquid post) of the keg as possible. This ensures the most accurate measurement of dispensed volume.</p>
+      <p>The sensor connects inline with the beverage tubing. Depending on your kegerator, you may need short pieces of beverage tubing and clamps to splice the sensor into the line.</p>
+
+      <h3>Device Placement</h3>
+      <p>The KegLevel Pico unit can be placed inside or outside your kegerator. If placed inside, keep it away from direct contact with kegs and moisture. If placed outside, route the wiring harness through the kegerator opening (e.g. the drip tray hole or the collar gap).</p>
+
+      <h3>Wiring Harness</h3>
+      <p>Connect each flow sensor to the wiring harness. Each sensor cable has three wires:</p>
+      <ul>
+        <li><strong>Red</strong> &mdash; 5V power</li>
+        <li><strong>Black</strong> &mdash; Ground</li>
+        <li><strong>Yellow</strong> &mdash; Signal (pulse output)</li>
+      </ul>
+      <p>The wiring harness is pre-assembled and labeled. Match each sensor connector to the corresponding tap port on the harness.</p>
+
+      <h3>Temperature Sensor</h3>
+      <p>A DS18B20 temperature sensor is included and pre-wired. Place the sensor probe inside the kegerator where it can read the ambient air temperature. Avoid placing it directly on a keg or near the cooling element.</p>
+
+      <h3>Validating the Installation</h3>
+      <p>After connecting everything, power on the Pico and open the web interface. Go to <strong>Settings &gt; Calibration</strong> and pour a small amount from each tap. Verify that pulses are being counted. If a tap shows zero pulses during flow, check the sensor wiring and connection.</p>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- Provisioning -->
+    <section class="help-section" id="provisioning">
+      <h2>Provisioning (Connecting to WiFi)</h2>
+      <p>When the KegLevel Pico is first powered on (or after a factory reset), it starts in <strong>Standalone mode</strong>. In this mode, the Pico creates its own WiFi network called <code>KegLevel-Pico</code>.</p>
+
+      <h3>Connecting to Your WiFi Network</h3>
+      <ol>
+        <li>Connect your phone or computer to the <code>KegLevel-Pico</code> WiFi network.</li>
+        <li>Open a browser and go to <code>http://192.168.4.1</code>.</li>
+        <li>Navigate to <strong>Settings &gt; System</strong>.</li>
+        <li>Click <strong>Enable WiFi Mode</strong>.</li>
+        <li>Enter your WiFi network name (SSID) and password when prompted.</li>
+        <li>The Pico will reboot and connect to your WiFi network.</li>
+      </ol>
+      <p>Once connected to your WiFi, the Pico will be accessible from any device on the same network. The Pico's IP address will be shown in your router's connected devices list.</p>
+
+      <h3>Standalone vs WiFi Mode</h3>
+      <table>
+        <tr><th>Feature</th><th>WiFi Mode</th><th>Standalone Mode</th></tr>
+        <tr><td>Web interface</td><td>Available on your network</td><td>Available at 192.168.4.1</td></tr>
+        <tr><td>Email notifications</td><td>Available</td><td>Not available</td></tr>
+        <tr><td>Firmware updates (OTA)</td><td>Available</td><td>Not available</td></tr>
+        <tr><td>Internet required</td><td>Yes (for your WiFi network)</td><td>No</td></tr>
+      </table>
+      <p>You can switch between modes at any time from <strong>Settings &gt; System</strong>.</p>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- First Time Setup -->
+    <section class="help-section" id="first-time-setup">
+      <h2>First Time Setup</h2>
+      <p>After installation and provisioning, follow these steps to get started:</p>
+      <ol>
+        <li><strong>Set active taps</strong> &mdash; Go to <strong>Settings &gt; System</strong> and set the number of taps you have connected. Only active taps will appear on the Taps screen.</li>
+        <li><strong>Choose units</strong> &mdash; Select Metric (liters) or Imperial (gallons) under <strong>Settings &gt; System</strong>.</li>
+        <li><strong>Add your beverages</strong> &mdash; Go to the <strong>Beverages</strong> screen and add each beer, cider, or other beverage you have on tap. Enter the name, ABV, IBU, and SRM (color) for each.</li>
+        <li><strong>Add your kegs</strong> &mdash; Go to the <strong>Kegs</strong> screen and add a keg for each physical keg. Set the beverage, capacity, and tare weight for each.</li>
+        <li><strong>Assign kegs to taps</strong> &mdash; Edit each keg and assign it to the correct tap, or use the tap card buttons on the <strong>Taps</strong> screen.</li>
+        <li><strong>Calibrate (optional)</strong> &mdash; If you want precise volume tracking, perform a calibration for each tap. See the <a href="#calibration">Calibration</a> section for instructions.</li>
+      </ol>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- Taps Screen -->
+    <section class="help-section" id="taps">
+      <h2>Taps Screen</h2>
+      <p>The Taps screen is the main dashboard. It shows a card for each active tap with real-time information.</p>
+
+      <h3>Tap Cards</h3>
+      <p>Each tap card displays:</p>
+      <ul>
+        <li><strong>Tap number</strong> &mdash; Tap 1 through Tap 5</li>
+        <li><strong>Beverage name</strong> &mdash; The beverage currently assigned to this tap</li>
+        <li><strong>Keg level</strong> &mdash; A visual level indicator showing how much beer remains</li>
+        <li><strong>Volume remaining</strong> &mdash; The remaining volume in liters or gallons</li>
+        <li><strong>ABV, IBU, SRM</strong> &mdash; Beverage stats displayed on the card</li>
+        <li><strong>Pour indicator</strong> &mdash; Animates when the system detects an active pour</li>
+      </ul>
+
+      <h3>Tap Card Actions</h3>
+      <p>Click the <strong>keg icon</strong> on a tap card to open the keg selection menu. From there you can:</p>
+      <ul>
+        <li>Assign a different keg to the tap</li>
+        <li>Mark the current keg as empty (zeros the volume and unassigns it)</li>
+        <li>View calibration data for the keg being kicked</li>
+      </ul>
+
+      <h3>Temperature</h3>
+      <p>The current kegerator temperature is shown in the header bar at the top left. It updates automatically.</p>
+
+      <h3>Simulated Pours</h3>
+      <p>If the Pico is in simulation mode (no physical sensors), a <strong>Pour</strong> button appears on each tap card. Clicking it simulates dispensing a small amount of beer so you can test the system without hardware.</p>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- Kegs Screen -->
+    <section class="help-section" id="kegs">
+      <h2>Kegs Screen</h2>
+      <p>The Kegs screen is your keg inventory. Each row shows a keg with its name, contents (beverage), tap assignment, and action buttons.</p>
+
+      <h3>Adding a Keg</h3>
+      <p>Click <strong>+ ADD NEW</strong> to create a new keg. Keg names are auto-generated (Keg 01, Keg 02, etc.).</p>
+
+      <h3>Editing a Keg</h3>
+      <p>Click the <strong>edit</strong> button on a keg row to open the edit modal. You can change:</p>
+      <ul>
+        <li><strong>Beverage</strong> &mdash; Select which beverage is in this keg</li>
+        <li><strong>Empty (Tare) weight</strong> &mdash; The weight of the empty keg in kilograms</li>
+        <li><strong>Max Capacity</strong> &mdash; The maximum volume the keg holds in liters</li>
+        <li><strong>Total Weight</strong> &mdash; The total weight of the keg when full (used to calculate volume at fill)</li>
+        <li><strong>Tap assignment</strong> &mdash; Assign this keg to a tap, or set it to Unassigned</li>
+      </ul>
+      <p>The <strong>Volume at Fill</strong> field is automatically calculated from the total weight, tare weight, and a standard specific gravity of 1.014.</p>
+
+      <h3>Deleting a Keg</h3>
+      <p>Click the <strong>delete</strong> button on a keg row. You will be asked to confirm. A keg that is currently assigned to a tap must be unassigned first.</p>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- Beverages Screen -->
+    <section class="help-section" id="beverages">
+      <h2>Beverages Screen</h2>
+      <p>The Beverages screen is your beverage library. Every unique beer, cider, mead, or other drink you serve should be added here.</p>
+
+      <h3>Adding a Beverage</h3>
+      <p>Click <strong>+ ADD NEW</strong> to create a new beverage. Enter:</p>
+      <ul>
+        <li><strong>Name</strong> &mdash; The beverage name (e.g. "American IPA")</li>
+        <li><strong>ABV</strong> &mdash; Alcohol by volume (e.g. 6.5)</li>
+        <li><strong>IBU</strong> &mdash; International Bitterness Units (e.g. 55)</li>
+        <li><strong>SRM</strong> &mdash; Standard Reference Method color value (e.g. 8). A color swatch preview is shown as you adjust this value.</li>
+      </ul>
+
+      <h3>Editing a Beverage</h3>
+      <p>Click the <strong>edit</strong> button on a beverage row. Changes are saved immediately and reflected everywhere the beverage is used (tap cards, keg assignments, BatchFlow cards).</p>
+
+      <h3>Deleting a Beverage</h3>
+      <p>Click the <strong>delete</strong> button. If the beverage is currently assigned to a keg, you will be notified and must remove it from the keg first.</p>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- Settings: System -->
+    <section class="help-section" id="system">
+      <h2>Settings: System</h2>
+
+      <h3>Active Taps</h3>
+      <p>Set the number of taps you have physically connected. The Pico supports up to 5 taps. Only active taps are shown on the Taps screen and processed for flow detection.</p>
+
+      <h3>Units</h3>
+      <p>Choose between <strong>Metric</strong> (liters, Celsius) and <strong>Imperial</strong> (gallons, Fahrenheit). This affects all volume and temperature displays throughout the app.</p>
+
+      <h3>WiFi / Standalone Mode</h3>
+      <p>Two buttons let you switch between WiFi Mode and Standalone Mode. See <a href="#provisioning">Provisioning</a> for details on the differences between modes. Switching modes causes the Pico to reboot immediately.</p>
+
+      <div class="note">The mode buttons are disabled until the Pico confirms which mode it is currently in. The button for the current mode is always disabled.</div>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- Settings: Notifications -->
+    <section class="help-section" id="notifications">
+      <h2>Settings: Notifications</h2>
+      <p>The KegLevel Pico can send email notifications using the <a href="https://www.mailgun.com" target="_blank">Mailgun</a> email service. A free Mailgun account is sufficient for typical usage.</p>
+
+      <div class="note">Notifications require WiFi Mode with Internet access. They are not available in Standalone Mode.</div>
+
+      <h3>Setting Up Mailgun</h3>
+      <ol>
+        <li>Create a free account at <a href="https://www.mailgun.com" target="_blank">mailgun.com</a>.</li>
+        <li>From your Mailgun dashboard, find your <strong>API Key</strong> and <strong>Domain</strong>.</li>
+        <li>Enter these values on the Notifications settings screen along with your From and Recipient email addresses.</li>
+        <li>Click <strong>TEST SEND</strong> to verify the configuration. You should receive a test email.</li>
+        <li>Click <strong>SAVE</strong> to store the configuration on the Pico.</li>
+      </ol>
+
+      <h3>Regular Reports</h3>
+      <p>Set the <strong>Report Frequency</strong> to receive periodic email reports summarizing your keg levels and temperature. Options are None, Hourly, Daily, or Weekly.</p>
+
+      <h3>Conditional Reports</h3>
+      <p>Conditional reports are sent immediately when a threshold is crossed:</p>
+      <ul>
+        <li><strong>Low Volume</strong> &mdash; Triggered when any keg drops below the set volume. Slide to OFF to disable.</li>
+        <li><strong>Low Temp</strong> &mdash; Triggered when the kegerator temperature drops below the set threshold. Useful for detecting cooling malfunctions.</li>
+        <li><strong>High Temp</strong> &mdash; Triggered when the kegerator temperature rises above the set threshold. Useful for detecting door-left-open or cooling failure.</li>
+      </ul>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- Settings: Updates -->
+    <section class="help-section" id="updates">
+      <h2>Settings: Updates</h2>
+      <p>The KegLevel Pico supports over-the-air (OTA) firmware updates. When a new version is available, you can install it directly from this screen without disconnecting anything.</p>
+
+      <div class="note">OTA updates require WiFi Mode with Internet access. They are not available in Standalone Mode.</div>
+
+      <h3>Checking for Updates</h3>
+      <p>Click <strong>CHECK</strong> to query the update server. The current firmware version is shown at the top of the screen. If a newer version is available, the <strong>INSTALL</strong> button will become active.</p>
+
+      <h3>Installing an Update</h3>
+      <p>Click <strong>INSTALL</strong> to begin the update. A progress bar will show the download and installation progress. The update log below shows detailed status messages. After installation completes, click <strong>RELOAD</strong> to reboot the Pico with the new firmware.</p>
+
+      <div class="note">Do not power off the Pico during a firmware update. The web UI is included with the firmware and updates automatically.</div>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- Settings: About -->
+    <section class="help-section" id="about">
+      <h2>Settings: About</h2>
+      <p>The About screen displays copyright information, brand acknowledgements, and a link to support the project with a donation.</p>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- Settings: Calibration -->
+    <section class="help-section" id="calibration">
+      <h2>Settings: Calibration</h2>
+      <p>Calibration adjusts the K-factor for each flow sensor. The K-factor determines how many sensor pulses equal one liter of liquid. Every sensor is slightly different, so calibrating improves accuracy.</p>
+
+      <h3>How to Calibrate</h3>
+      <ol>
+        <li>Go to <strong>Settings &gt; Calibration</strong>.</li>
+        <li>Select the tap you want to calibrate. The tap button will highlight and the Pico begins counting pulses.</li>
+        <li>Pour a <strong>known volume</strong> of liquid through that tap into a measuring container. Pour only from the selected tap.</li>
+        <li>Use the <strong>Measured Volume</strong> slider (or +/&minus; buttons) to enter the exact volume you poured.</li>
+        <li>The <strong>New K-Factor</strong> is calculated automatically from the measured volume and pulse count.</li>
+        <li>Click <strong>SAVE CALIBRATION</strong> to apply the new K-factor.</li>
+      </ol>
+
+      <h3>Other Calibration Actions</h3>
+      <ul>
+        <li><strong>RESET PULSES</strong> &mdash; Clears the pulse counter to zero so you can start a fresh calibration pour.</li>
+        <li><strong>SET TO DEFAULT</strong> &mdash; Resets the K-factor to the factory default (5100 pulses per liter).</li>
+      </ul>
+
+      <h3>Tips for Best Results</h3>
+      <ul>
+        <li>Use a graduated measuring container for accurate volume measurement.</li>
+        <li>Pour at least 500 mL for a reliable calibration &mdash; larger volumes produce more accurate results.</li>
+        <li>Pour at a normal pace, similar to how you would pour a glass of beer.</li>
+        <li>If the <strong>Deduct volume from Inventory</strong> checkbox is checked, the poured volume will be subtracted from the keg's current level.</li>
+      </ul>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- BatchFlow -->
+    <section class="help-section" id="batchflow">
+      <h2>BatchFlow</h2>
+      <p>BatchFlow is a built-in brewing workflow board that helps you track batches from recipe to finished keg. It opens in a separate window from the <strong>BatchFlow</strong> button in the app header.</p>
+      <p>BatchFlow has its own help system. Click the <strong>?</strong> button inside the BatchFlow app for detailed instructions on using the workflow board, adding batches, moving cards between columns, and editing beverages.</p>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+    <!-- Troubleshooting -->
+    <section class="help-section" id="troubleshooting">
+      <h2>Troubleshooting</h2>
+
+      <h3>LED Indicators</h3>
+      <table>
+        <tr><th>LED Behavior</th><th>Meaning</th></tr>
+        <tr><td>Blinking slowly</td><td>Pico is starting up or searching for WiFi</td></tr>
+        <tr><td>Solid on</td><td>Pico is connected and running normally</td></tr>
+        <tr><td>Cycles blink &rarr; solid &rarr; blink</td><td>Server is crashing on startup and rebooting in a loop</td></tr>
+        <tr><td>LED off</td><td>Pico has lost power or hard crashed &mdash; unplug and replug</td></tr>
+      </table>
+
+      <h3>Common Issues</h3>
+      <table>
+        <tr><th>Problem</th><th>Possible Cause &amp; Fix</th></tr>
+        <tr><td>Web page won't load but Pico responds to ping</td><td>The web server may have crashed due to a missing file. Check the Pico's error log if accessible, or reflash the firmware.</td></tr>
+        <tr><td>Web page loads from phone but not from PC</td><td>Windows Firewall or a proxy may be intercepting traffic on port 80. Try disabling the firewall temporarily to test.</td></tr>
+        <tr><td>No pulses counted during pour</td><td>Check the sensor wiring. Ensure the sensor connector is fully seated in the wiring harness. Try a different tap to isolate whether the issue is the sensor or the wiring.</td></tr>
+        <tr><td>Temperature shows &ldquo;&mdash;&rdquo; or no reading</td><td>The DS18B20 temperature sensor may be disconnected. Check the sensor connector on the wiring harness.</td></tr>
+        <tr><td>Can't connect to KegLevel-Pico WiFi</td><td>The Pico may not be in Standalone mode, or it may still be booting. Wait 30 seconds after powering on and try again.</td></tr>
+        <tr><td>Notifications not sending</td><td>Verify that the Pico is in WiFi mode with Internet access. Double-check the Mailgun API key, domain, and email addresses on the Notifications settings screen. Use TEST SEND to diagnose.</td></tr>
+        <tr><td>OTA update fails</td><td>Ensure the Pico has a stable Internet connection. Do not power off during the update. If the update fails, the previous firmware should still be running &mdash; try again.</td></tr>
+      </table>
+
+      <h3>Factory Reset</h3>
+      <p>If the Pico is unresponsive and you cannot access the web interface, you can reflash the firmware using a USB connection and the <code>mpremote</code> tool. This will restore the Pico to its original state. Your keg and beverage data will be preserved in the configuration files unless you explicitly delete them.</p>
+
+      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
+    </section>
+
+  </div>
+
+</body>
+</html>
