@@ -741,6 +741,8 @@ async function editorSave(colKey, panel) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
+      beverages.push(saved);
+      bevMap[saved.id] = saved;
       addBatch(colKey, saved.id);
     } else {
       saved = await apiFetch(`/api/beverages/${bevId}`, {
@@ -748,6 +750,9 @@ async function editorSave(colKey, panel) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
+      bevMap[bevId] = saved;
+      const idx = beverages.findIndex(b => b.id === bevId);
+      if (idx >= 0) beverages[idx] = saved;
     }
     await loadBeverages();
     closePanel(colKey, "editor");
