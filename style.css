@@ -334,7 +334,7 @@ body {
   cursor: pointer;
 }
 
-.top-nav .nav-btn:hover:not(:disabled) {
+.top-nav .nav-btn:hover:not(:disabled):not(.active) {
   background: #333;
 }
 
@@ -342,6 +342,10 @@ body {
   background: #cc8400;
   color: #1a1a1a;
   border-color: #cc8400;
+}
+
+.top-nav .nav-btn.active:hover {
+  color: #fff;
 }
 
 .top-nav .nav-btn:disabled {
