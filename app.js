@@ -2011,7 +2011,7 @@ async function confirmDeleteBeverage(bevId, bevName) {
   } catch (_) {}
   pendingDelete = { type: 'beverage', id: bevId };
   document.getElementById('modal-confirm-text').textContent =
-    `Delete beverage "${displayName}"?`;
+    `Delete beverage "${displayName}"? This will also remove it from BatchFlow.`;
   document.getElementById('modal-confirm').classList.remove('hidden');
 }
 
@@ -2029,8 +2029,23 @@ async function doConfirmDelete() {
       await apiFetch(`/api/kegs/${pendingDelete.id}`, { method: 'DELETE' });
       refreshKegList();
     } else {
-      await apiFetch(`/api/beverages/${pendingDelete.id}`, { method: 'DELETE' });
+      const deletedId = pendingDelete.id;
+      await apiFetch(`/api/beverages/${deletedId}`, { method: 'DELETE' });
       refreshBeverageList();
+      try {
+        const wf = await apiFetch('/api/batchflow');
+        if (wf?.columns) {
+          let changed = false;
+          for (const key of Object.keys(wf.columns)) {
+            const before = wf.columns[key].length;
+            wf.columns[key] = wf.columns[key].filter(id => id !== deletedId);
+            if (wf.columns[key].length !== before) changed = true;
+          }
+          if (changed) {
+            await apiFetch('/api/batchflow', { method: 'PUT', body: JSON.stringify(wf) });
+          }
+        }
+      } catch (_) {}
     }
     closeConfirmModal();
     if (lastData) { lastData = null; pollOnce(); }
