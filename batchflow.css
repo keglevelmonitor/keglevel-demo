@@ -232,13 +232,6 @@ body.bf-dev-mode .bf-board {
   min-width: 0;
 }
 
-.bf-card-abv {
-  font-size: 13px;
-  font-weight: 400;
-  margin-left: 8px;
-  white-space: nowrap;
-}
-
 .bf-card-style {
   font-size: 13px;
   font-style: italic;
@@ -251,7 +244,7 @@ body.bf-dev-mode .bf-board {
   min-width: 0;
 }
 
-.bf-card-ibu {
+.bf-card-stats {
   font-size: 13px;
   margin-left: 8px;
   white-space: nowrap;

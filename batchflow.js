@@ -220,10 +220,6 @@ function buildCard(bev, colKey, idx) {
   name.className = "bf-card-name";
   name.textContent = bev.name || "Unknown";
   row1.appendChild(name);
-  const abv = document.createElement("span");
-  abv.className = "bf-card-abv";
-  abv.textContent = bev.abv != null && bev.abv !== "" ? bev.abv + "%" : "--";
-  row1.appendChild(abv);
   card.appendChild(row1);
 
   const row2 = document.createElement("div");
@@ -232,11 +228,14 @@ function buildCard(bev, colKey, idx) {
   style.className = "bf-card-style";
   style.textContent = bev.style || "";
   row2.appendChild(style);
-  const ibu = document.createElement("span");
-  ibu.className = "bf-card-ibu";
-  const ibuVal = bev.ibu != null && bev.ibu !== "" ? bev.ibu : "--";
-  ibu.textContent = "IBU: " + ibuVal;
-  row2.appendChild(ibu);
+  const statsParts = [];
+  const abvVal = parseFloat(bev.abv);
+  if (abvVal > 0) statsParts.push(abvVal + "% ABV");
+  if (bev.ibu != null && bev.ibu !== "") statsParts.push(bev.ibu + " IBU");
+  const stats = document.createElement("span");
+  stats.className = "bf-card-stats";
+  stats.textContent = statsParts.join(" \u2022 ");
+  row2.appendChild(stats);
   card.appendChild(row2);
 
   // Edit button
