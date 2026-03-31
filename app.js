@@ -7,6 +7,7 @@ const STORAGE_KEY = 'keglevel_pico_ip';
 const STORAGE_KEY_UNITS = 'keglevel_units';
 const STORAGE_KEY_CAL_DEDUCT = 'keglevel_cal_deduct';
 const LITERS_TO_GAL = 0.264172;
+const KG_TO_LB = 2.20462;
 
 /** SRM to hex color map (matches KegLevelPico main_kivy.py) */
 const SRM_HEX_MAP = {
@@ -1448,8 +1449,11 @@ function escapeHtml(s) {
 const DENSITY_SG = 1.014;
 
 function updateKegVolumeAtFill() {
-  const tare = parseFloat(document.getElementById('keg-tare').value) || 0;
-  const total = parseFloat(document.getElementById('keg-total-weight').value) || 0;
+  const imperial = getUnits() === 'imperial';
+  const tareRaw = parseFloat(document.getElementById('keg-tare').value) || 0;
+  const totalRaw = parseFloat(document.getElementById('keg-total-weight').value) || 0;
+  const tare = imperial ? tareRaw / KG_TO_LB : tareRaw;
+  const total = imperial ? totalRaw / KG_TO_LB : totalRaw;
   const liquidKg = Math.max(0, total - tare);
   const volLiters = liquidKg / DENSITY_SG;
   document.getElementById('keg-volume-at-fill').textContent = formatVolume(volLiters);
@@ -1499,6 +1503,11 @@ async function openKegEdit(kegId) {
   const useImperial = getUnits() === 'imperial';
   const capUnitSpan = document.getElementById('max-cap-unit');
   if (capUnitSpan) capUnitSpan.textContent = useImperial ? 'Gal' : 'L';
+  const tareUnitSpan = document.getElementById('tare-unit');
+  const totalWeightUnitSpan = document.getElementById('total-weight-unit');
+  const wLabel = useImperial ? 'lb' : 'kg';
+  if (tareUnitSpan) tareUnitSpan.textContent = wLabel;
+  if (totalWeightUnitSpan) totalWeightUnitSpan.textContent = wLabel;
   if (kegId && kegData) {
     const keg = kegData;
     idInput.value = keg.id;
@@ -1513,8 +1522,12 @@ async function openKegEdit(kegId) {
     maxCapInput.value = useImperial
       ? (maxCapL * LITERS_TO_GAL).toFixed(2)
       : roundToOneDecimal(maxCapL);
-    tareInput.value = roundToOneDecimal(tare);
-    totalInput.value = roundToOneDecimal(total);
+    tareInput.value = useImperial
+      ? (tare * KG_TO_LB).toFixed(1)
+      : roundToOneDecimal(tare);
+    totalInput.value = useImperial
+      ? (total * KG_TO_LB).toFixed(1)
+      : roundToOneDecimal(total);
     tapSelect.value = String(keg.tap_index ?? -1);
   } else {
     idInput.value = '';
@@ -1522,8 +1535,8 @@ async function openKegEdit(kegId) {
     nameReadonly.textContent = '';
     beverageSelect.value = '';
     maxCapInput.value = useImperial ? (19 * LITERS_TO_GAL).toFixed(2) : '19';
-    tareInput.value = '4.5';
-    totalInput.value = '23.5';
+    tareInput.value = useImperial ? (4.5 * KG_TO_LB).toFixed(1) : '4.5';
+    totalInput.value = useImperial ? (23.5 * KG_TO_LB).toFixed(1) : '23.5';
     tapSelect.value = '-1';
   }
   updateKegVolumeAtFill();
@@ -1557,10 +1570,13 @@ async function saveKeg(e) {
   const nameReadonly = document.getElementById('keg-name-readonly');
   const kegName = nameReadonly.textContent.trim() || 'New Keg';
   const beverageSelect = document.getElementById('keg-beverage');
+  const imperial = getUnits() === 'imperial';
   const maxCapRaw = parseFloat(document.getElementById('keg-max-capacity').value) || 19;
-  const maxCap = getUnits() === 'imperial' ? maxCapRaw / LITERS_TO_GAL : maxCapRaw;
-  const tare = parseFloat(roundToOneDecimal(document.getElementById('keg-tare').value)) || 4.5;
-  const total = parseFloat(roundToOneDecimal(document.getElementById('keg-total-weight').value)) || 23.5;
+  const maxCap = imperial ? maxCapRaw / LITERS_TO_GAL : maxCapRaw;
+  const tareRaw = parseFloat(roundToOneDecimal(document.getElementById('keg-tare').value)) || 4.5;
+  const totalRaw = parseFloat(roundToOneDecimal(document.getElementById('keg-total-weight').value)) || 23.5;
+  const tare = imperial ? tareRaw / KG_TO_LB : tareRaw;
+  const total = imperial ? totalRaw / KG_TO_LB : totalRaw;
   const tapSelect = document.getElementById('keg-tap');
 
   const beverageId = beverageSelect.value || '';
@@ -2144,8 +2160,13 @@ document.addEventListener('DOMContentLoaded', () => {
         updateHeader(lastData);
       }
       updateAlertsSliderLabels();
+      const imp = unitsEl.value === 'imperial';
       const capUnitSpan = document.getElementById('max-cap-unit');
-      if (capUnitSpan) capUnitSpan.textContent = unitsEl.value === 'imperial' ? 'Gal' : 'L';
+      if (capUnitSpan) capUnitSpan.textContent = imp ? 'Gal' : 'L';
+      const tareUnitSpan = document.getElementById('tare-unit');
+      const totalWeightUnitSpan = document.getElementById('total-weight-unit');
+      if (tareUnitSpan) tareUnitSpan.textContent = imp ? 'lb' : 'kg';
+      if (totalWeightUnitSpan) totalWeightUnitSpan.textContent = imp ? 'lb' : 'kg';
     });
   }
   const leakDetEl = document.getElementById('leak-detection');
