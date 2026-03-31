@@ -577,13 +577,13 @@ function updateAlertsSliderLabels() {
   document.getElementById('alerts-high-temp-label').textContent = highTemp < 35 ? '(OFF)' : useMetric ? `(${(highTemp - 32) * 5 / 9 | 0} °C)` : `(${highTemp} °F)`;
 }
 
-function setBtnSaving(btn, saving) {
+function setBtnSaving(btn, saving, loadingText) {
   if (!btn) return;
   if (saving) {
     btn.classList.add('btn-saving');
     btn.disabled = true;
     btn.dataset.originalText = btn.textContent;
-    btn.textContent = 'Saving…';
+    btn.textContent = loadingText || 'Saving…';
   } else {
     btn.classList.remove('btn-saving');
     btn.disabled = false;
@@ -1996,32 +1996,23 @@ function confirmDeleteKeg(kegId) {
   document.getElementById('modal-confirm').classList.remove('hidden');
 }
 
-async function confirmDeleteBeverage(bevId) {
+async function confirmDeleteBeverage(bevId, bevName) {
+  const displayName = bevName || bevId;
   try {
-    const [kegs, beverages] = await Promise.all([
-      apiFetch('/api/kegs'),
-      apiFetch('/api/beverages'),
-    ]);
-    const bev = (beverages || []).find(b => b.id === bevId);
-    const bevName = bev ? bev.name : bevId;
+    const kegs = await apiFetch('/api/kegs');
     const assignedKegs = (kegs || []).filter(k => k.beverage_id === bevId);
     if (assignedKegs.length > 0) {
       const kegNames = assignedKegs.map(k => k.title || k.name || k.id).join(', ');
       document.getElementById('bev-in-use-text').textContent =
-        `${bevName} is currently assigned to ${kegNames}. Remove the beverage from ${assignedKegs.length > 1 ? 'those kegs' : 'that keg'} first, or assign a different beverage to ${assignedKegs.length > 1 ? 'them' : 'it'}.`;
+        `${displayName} is currently assigned to ${kegNames}. Remove the beverage from ${assignedKegs.length > 1 ? 'those kegs' : 'that keg'} first, or assign a different beverage to ${assignedKegs.length > 1 ? 'them' : 'it'}.`;
       document.getElementById('modal-bev-in-use').classList.remove('hidden');
       return;
     }
-    pendingDelete = { type: 'beverage', id: bevId };
-    document.getElementById('modal-confirm-text').textContent =
-      `Delete beverage "${bevName}"?`;
-    document.getElementById('modal-confirm').classList.remove('hidden');
-  } catch (_) {
-    pendingDelete = { type: 'beverage', id: bevId };
-    document.getElementById('modal-confirm-text').textContent =
-      `Delete beverage "${bevId}"?`;
-    document.getElementById('modal-confirm').classList.remove('hidden');
-  }
+  } catch (_) {}
+  pendingDelete = { type: 'beverage', id: bevId };
+  document.getElementById('modal-confirm-text').textContent =
+    `Delete beverage "${displayName}"?`;
+  document.getElementById('modal-confirm').classList.remove('hidden');
 }
 
 function closeConfirmModal() {
@@ -2033,7 +2024,7 @@ async function doConfirmDelete() {
   if (!pendingDelete) return;
   const btn = document.getElementById('btn-confirm-delete');
   try {
-    setBtnSaving(btn, true);
+    setBtnSaving(btn, true, 'Deleting…');
     if (pendingDelete.type === 'keg') {
       await apiFetch(`/api/kegs/${pendingDelete.id}`, { method: 'DELETE' });
       refreshKegList();
@@ -2063,7 +2054,12 @@ function initInventory() {
   });
   document.getElementById('beverage-list')?.addEventListener('click', (e) => {
     const delBtn = e.target.closest('.btn-delete[data-bev-id]');
-    if (delBtn) { confirmDeleteBeverage(delBtn.dataset.bevId); return; }
+    if (delBtn) {
+      const row = delBtn.closest('.list-row-bev');
+      const name = row?.querySelector('.row-name')?.textContent || '';
+      confirmDeleteBeverage(delBtn.dataset.bevId, name);
+      return;
+    }
     const row = e.target.closest('.list-row-bev[data-bev-id]');
     if (row) openBeverageEdit(row.dataset.bevId);
   });
