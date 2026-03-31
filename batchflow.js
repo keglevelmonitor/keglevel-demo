@@ -224,16 +224,13 @@ function buildCard(bev, colKey, idx) {
 
   const row2 = document.createElement("div");
   row2.className = "bf-card-row";
-  const style = document.createElement("span");
-  style.className = "bf-card-style";
-  style.textContent = bev.style || "";
-  row2.appendChild(style);
   const statsParts = [];
   const abvVal = parseFloat(bev.abv);
   if (abvVal > 0) statsParts.push(abvVal + "% ABV");
   if (bev.ibu != null && bev.ibu !== "") statsParts.push(bev.ibu + " IBU");
   const stats = document.createElement("span");
   stats.className = "bf-card-stats";
+  stats.style.marginLeft = "auto";
   stats.textContent = statsParts.join(" \u2022 ");
   row2.appendChild(stats);
   card.appendChild(row2);
