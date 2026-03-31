@@ -1317,6 +1317,27 @@ body {
   margin: 0;
 }
 
+/* Leak detection */
+.tap-card .status.leak { color: #f59e0b; font-weight: 700; }
+.tap-card.leak { border-color: #f59e0b; box-shadow: 0 0 8px rgba(245,158,11,.35); }
+
+/* Drip test button */
+.pour-btn.drip-btn {
+  background: #292524;
+  border-color: #57534e;
+  color: #a8a29e;
+}
+.pour-btn.drip-btn.dripping {
+  background: #78350f;
+  border-color: #f59e0b;
+  color: #fbbf24;
+  animation: drip-pulse 1.2s ease-in-out infinite;
+}
+@keyframes drip-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .55; }
+}
+
 /* Demo badge & notice */
 .demo-badge {
   background: #ffc107;

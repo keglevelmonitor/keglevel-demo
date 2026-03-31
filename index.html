@@ -15,7 +15,7 @@
     <header class="main-header">
       <span id="temp" class="temp"></span>
       <a class="btn-learn-more demo-badge-left" href="https://www.youtube.com/watch?v=PLACEHOLDER" target="_blank">LEARN MORE</a>
-      <h1 id="brand">KegLevel Pico</h1>
+      <h1 id="brand">KegLevel Brain</h1>
       <a class="btn-purchase demo-badge-right" href="https://keglevelmonitor.github.io/keglevel-demo/purchase.html" target="_blank">BUY NOW</a>
       <button class="btn-batchflow" id="btn-batchflow">BatchFlow</button>
     </header>
@@ -91,7 +91,7 @@
               <input type="number" id="keg-tare" min="0" max="20" step="0.1" value="4.5" inputmode="decimal" />
             </div>
             <div class="keg-field">
-              <label>Max Capacity (L)</label>
+              <label>Max Capacity (<span id="max-cap-unit">L</span>)</label>
               <input type="number" id="keg-max-capacity" min="0" max="60" step="0.1" value="19" inputmode="decimal" />
             </div>
           </div>
@@ -158,6 +158,28 @@
     </div>
 
 
+    <!-- Calibrate sub-modal (Keg Kicked) -->
+    <div id="modal-calibrate" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-loading-overlay"><div class="modal-loading-spinner"></div></div>
+        <h3 id="calibrate-title">Calibration Data</h3>
+        <div class="calibrate-grid">
+          <span>Starting Volume:</span><span id="cal-start-vol">—</span>
+          <span>Total Pulses:</span><span id="cal-total-pulses">—</span>
+          <span>Current K-Factor:</span><span id="cal-old-k">—</span>
+          <span class="cal-new-label">CALCULATED NEW K-FACTOR:</span><span id="cal-new-k" class="cal-new-value">—</span>
+        </div>
+        <label class="cal-confirm-label">
+          <input type="checkbox" id="cal-confirm-chk" />
+          This keg is empty and was fully dispensed from this tap.
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="cal-cancel">Cancel</button>
+          <button type="button" class="btn-save" id="cal-save">SAVE CALIBRATION & RESET</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Mark Empty sub-modal -->
     <div id="modal-mark-empty" class="modal hidden">
       <div class="modal-content">
@@ -215,10 +237,14 @@
                 <option value="imperial">Gal (Imperial)</option>
               </select>
             </div>
+            <div class="system-row">
+              <label for="leak-detection">Leak Detection</label>
+              <input type="checkbox" id="leak-detection" checked />
+            </div>
             <div class="wifi-mode-section demo-disabled">
               <label>Change how the Pico web page is accessed:</label>
               <div class="wifi-mode-buttons">
-                <button id="btn-enable-wifi" class="btn-wifi-reset" disabled>Enable WiFi Mode</button>
+                <button id="btn-enable-wifi" class="btn-wifi-reset" disabled>Enable Network Mode</button>
                 <button id="btn-enable-standalone" class="btn-wifi-reset" disabled>Enable Standalone Mode</button>
               </div>
             </div>
@@ -226,12 +252,18 @@
         </div>
         <!-- ALERTS tab -->
         <div id="settings-alerts" class="settings-pane demo-disabled">
+          <div id="ap-alerts-notice" class="ap-mode-notice hidden">
+            Notifications are not available because the Pico is in Standalone mode and is not connected to the Internet. To use the notifications feature, you must switch the mode to Network on the System Settings page. The WiFi network must have Internet access, and the Pico must remain in Network mode for the notifications feature to work.
+          </div>
           <p class="alerts-note">Note &mdash; Notifications require a free account at mailgun.com. See <strong>?</strong> Help for information and instructions.</p>
           <div class="alerts-section">
-            <h3>Regular Reports</h3>
-            <label>Report Frequency</label>
+            <h3>Scheduled Notifications</h3>
+            <label>Notification Frequency</label>
             <select id="alerts-frequency" disabled>
+              <option value="none">None</option>
+              <option value="hourly">Hourly</option>
               <option value="daily" selected>Daily</option>
+              <option value="weekly">Weekly</option>
             </select>
             <label>Mailgun API Key</label>
             <input type="password" id="alerts-api-key" value="key-demo1234567890" disabled />
@@ -243,7 +275,7 @@
             <input type="email" id="alerts-to" value="brewer@example.com" disabled />
           </div>
           <div class="alerts-section">
-            <h3>Conditional Reports</h3>
+            <h3>Conditional Notifications</h3>
             <label>Low Volume Alert <span id="alerts-low-vol-label">(2.50 L)</span></label>
             <input type="range" id="alerts-low-vol" min="0" max="5" step="0.25" value="2.5" disabled />
             <label>Low Temp Alert <span id="alerts-low-temp-label">(33 °F)</span></label>
@@ -254,6 +286,9 @@
         </div>
         <!-- UPDATES tab -->
         <div id="settings-updates" class="settings-pane demo-disabled">
+          <div id="ap-updates-notice" class="ap-mode-notice hidden">
+            Firmware Updates are not available because the Pico is in Standalone mode and is not connected to the Internet. To update the firmware, you must switch the mode to Network on the System Settings page and the WiFi network must have Internet access.
+          </div>
           <p class="updates-version" id="updates-version">Firmware: 1.5.0-demo</p>
           <p class="updates-note" id="updates-note">Web UI is served from the Pico and updates with firmware.</p>
           <pre id="updates-log" class="updates-log">Demo connected. If Pico were connected the current firmware revision would be shown here.</pre>
@@ -298,7 +333,7 @@
               </div>
               <div class="cal-data-block">
                 <label>New K-Factor</label>
-                <input type="number" id="cal-k-input" min="100" value="5100" disabled />
+                <input type="number" id="cal-k-input" min="100" value="2900" disabled />
               </div>
               <div class="cal-data-block">
                 <label>Current K-Factor</label>
@@ -314,24 +349,14 @@
       </div>
     </main>
 
-    <!-- Calibrate sub-modal (Keg Kicked) -->
-    <div id="modal-calibrate" class="modal hidden">
-      <div class="modal-content">
-        <div class="modal-loading-overlay"><div class="modal-loading-spinner"></div></div>
-        <h3 id="calibrate-title">Calibration Data</h3>
-        <div class="calibrate-grid">
-          <span>Starting Volume:</span><span id="cal-start-vol">—</span>
-          <span>Total Pulses:</span><span id="cal-total-pulses">—</span>
-          <span>Current K-Factor:</span><span id="cal-old-k">—</span>
-          <span class="cal-new-label">CALCULATED NEW K-FACTOR:</span><span id="cal-new-k" class="cal-new-value">—</span>
-        </div>
-        <label class="cal-confirm-label">
-          <input type="checkbox" id="cal-confirm-chk" />
-          This keg is empty and was fully dispensed from this tap.
-        </label>
+    <!-- WiFi mode switch confirm modal -->
+    <div id="modal-wifi-reset" class="modal hidden">
+      <div class="modal-content modal-confirm">
+        <p id="wifi-reset-msg"></p>
+        <p style="color:#ffc107;font-size:13px">The Pico will reboot immediately.</p>
         <div class="modal-actions">
-          <button type="button" class="btn-cancel" id="cal-cancel">Cancel</button>
-          <button type="button" class="btn-save" id="cal-save">SAVE CALIBRATION & RESET</button>
+          <button type="button" class="btn-cancel" id="btn-wifi-reset-cancel">Cancel</button>
+          <button type="button" class="btn-delete" id="btn-wifi-reset-confirm">Switch &amp; Reboot</button>
         </div>
       </div>
     </div>
@@ -361,7 +386,7 @@
     <div id="modal-demo-splash" class="modal">
       <div class="modal-content modal-splash">
         <h3>Welcome to KegLevel Demo</h3>
-        <p>This is a fully interactive demo of the <strong>KegLevel Pico</strong> keg monitoring system. No hardware required.</p>
+        <p>This is a fully interactive demo of the <strong>KegLevel Brain</strong> keg monitoring system. No hardware required.</p>
         <ul class="splash-list">
           <li>5 taps pre-loaded with beverages and realistic keg levels</li>
           <li>Live temperature readings that fluctuate naturally</li>

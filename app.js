@@ -1,5 +1,5 @@
 /**
- * KegLevel Pico Web — Phase 1 Dashboard
+ * KegLevel Brain Web — Phase 1 Dashboard
  * Polls /api/state, displays tap cards, simulated pour buttons.
  */
 
@@ -36,6 +36,8 @@ let lastData = null;
 let simPouringTap = null;
 let simPouringClearAt = 0;
 let simModeEnabled = true;
+let dripInterval = null;
+let dripTap = null;
 let tempClickCount = 0;
 let tempClickWindow = 0;
 const RAPID_CLICK_WINDOW_MS = 1500;
@@ -147,7 +149,7 @@ async function postAdjust(tapIndex, liters) {
   return false;
 }
 
-function getTapDisplayData(i, tap, activeTaps) {
+function getTapDisplayData(i, tap, activeTaps, leakWarnings) {
   const active = i < activeTaps;
   const remaining = parseFloat(tap.remaining_liters ?? 0);
   const maxCapacity = parseFloat(tap.maximum_full_volume_liters ?? 0) || parseFloat(tap.starting_volume_liters ?? 0) || 18.93;
@@ -155,17 +157,18 @@ function getTapDisplayData(i, tap, activeTaps) {
   const pouring = !!tap.pouring || (i === simPouringTap && Date.now() < simPouringClearAt);
   const hasKeg = !!tap.keg_id;
   const noKeg = !hasKeg;
+  const leakWarning = !noKeg && !pouring && leakWarnings && !!leakWarnings[i];
   const abv = parseFloat(tap.abv ?? 0);
   const ibu = tap.ibu != null && tap.ibu !== '' ? parseInt(tap.ibu, 10) : null;
   const statsParts = [];
   if (abv > 0) statsParts.push(`${abv}% ABV`);
   if (ibu != null && ibu !== '') statsParts.push(`${ibu} IBU`);
   return {
-    active, percentFull, pouring, hasKeg, noKeg,
+    active, percentFull, pouring, hasKeg, noKeg, leakWarning,
     beverageName: tap.beverage_name || (active ? (hasKeg ? 'No beverage' : 'No Keg') : ''),
     tapLabel: tap.tap_label || `Tap ${i + 1}`,
     statsText: hasKeg ? statsParts.join(' \u2022 ') : '',
-    statusText: noKeg ? 'Offline' : pouring ? 'Pouring' : 'Idle',
+    statusText: noKeg ? 'Offline' : pouring ? 'Pouring' : leakWarning ? 'Leak?' : 'Idle',
     remainingText: noKeg ? '--' : formatVolume(remaining),
     srmColor: getSrmColor(tap.srm),
     kegLabel: noKeg ? '' : (tap.keg_name || ''),
@@ -173,7 +176,7 @@ function getTapDisplayData(i, tap, activeTaps) {
 }
 
 function updateTapCardDOM(card, d) {
-  card.className = 'tap-card' + (d.pouring ? ' pouring' : '') + (d.noKeg ? ' offline' : '');
+  card.className = 'tap-card' + (d.pouring ? ' pouring' : '') + (d.leakWarning ? ' leak' : '') + (d.noKeg ? ' offline' : '');
   card.querySelector('.tap-label').textContent = d.tapLabel;
   card.querySelector('.beverage-name').textContent = d.beverageName;
   card.querySelector('.stats').textContent = d.statsText || '\u00a0';
@@ -185,7 +188,8 @@ function updateTapCardDOM(card, d) {
   card.querySelector('.keg-label').textContent = d.kegLabel;
   card.querySelector('.remaining').textContent = d.remainingText;
   const statusEl = card.querySelector('.status');
-  statusEl.className = 'status ' + d.statusText.toLowerCase();
+  const statusClass = d.leakWarning ? 'leak' : d.statusText.toLowerCase();
+  statusEl.className = 'status ' + statusClass;
   statusEl.textContent = d.statusText;
   card.querySelectorAll('.pour-btn').forEach((btn) => {
     btn.disabled = !d.active || !d.hasKeg;
@@ -196,6 +200,7 @@ function renderTapCards(data) {
   const grid = document.getElementById('tap-grid');
   const taps = data.taps || [];
   const activeTaps = data.active_taps ?? 5;
+  const leakWarnings = data.leak_warnings || [];
   grid.style.setProperty('--active-taps', String(activeTaps));
   const existing = grid.querySelectorAll('.tap-card');
   const rebuild = existing.length !== activeTaps ||
@@ -205,14 +210,14 @@ function renderTapCards(data) {
     grid.dataset.simMode = String(simModeEnabled);
     grid.innerHTML = '';
     for (let i = 0; i < activeTaps; i++) {
-      const d = getTapDisplayData(i, taps[i] || {}, activeTaps);
+      const d = getTapDisplayData(i, taps[i] || {}, activeTaps, leakWarnings);
       const card = document.createElement('div');
       card.dataset.tapIndex = i;
       const pourHtml = simModeEnabled
         ? `<div class="pour-buttons">
             <button class="pour-btn" data-liters="0.25" ${!d.active || !d.hasKeg ? 'disabled' : ''}>0.25 L</button>
             <button class="pour-btn" data-liters="0.5"  ${!d.active || !d.hasKeg ? 'disabled' : ''}>0.50 L</button>
-            <button class="pour-btn" data-liters="1"   ${!d.active || !d.hasKeg ? 'disabled' : ''}>1.0 L</button>
+            <button class="pour-btn drip-btn${dripTap === i ? ' dripping' : ''}" data-tap="${i}" ${!d.active || !d.hasKeg ? 'disabled' : ''}>DRIP</button>
           </div>`
         : '';
       card.innerHTML = `
@@ -232,7 +237,7 @@ function renderTapCards(data) {
   }
 
   for (let i = 0; i < activeTaps; i++) {
-    const d = getTapDisplayData(i, taps[i] || {}, activeTaps);
+    const d = getTapDisplayData(i, taps[i] || {}, activeTaps, leakWarnings);
     updateTapCardDOM(existing[i], d);
   }
 }
@@ -253,7 +258,7 @@ function updateHeader(data) {
     el.textContent = `${f.toFixed(1)} °F`;
   }
 
-  document.getElementById('brand').textContent = data?.version ? `KegLevel Pico` : 'KegLevel Pico';
+  document.getElementById('brand').textContent = data?.version ? `KegLevel Brain` : 'KegLevel Brain';
 }
 
 async function pollOnce() {
@@ -268,6 +273,9 @@ async function pollOnce() {
     renderTapCards(data);
     updateHeader(data);
     updateApModeNotice(data);
+    if (dripTap !== null && data.leak_warnings && data.leak_warnings[dripTap]) {
+      stopDrip();
+    }
   } else {
     consecutiveFailures++;
     if (connectionState === 'connected' && consecutiveFailures >= OFFLINE_AFTER_FAILURES) {
@@ -289,10 +297,51 @@ function resumePolling() {
   pollTimer = setInterval(pollOnce, POLL_INTERVAL_MS);
 }
 
+function startDrip(tapIndex) {
+  stopDrip();
+  dripTap = tapIndex;
+  const sendDrip = async () => {
+    const base = getPicoBaseUrl();
+    if (!base) return;
+    try {
+      await fetch(`${base}/api/test/drip`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tap: dripTap, pulses: 5 }),
+        signal: AbortSignal.timeout(3000),
+      });
+    } catch (_) {}
+  };
+  sendDrip();
+  dripInterval = setInterval(sendDrip, 3000);
+  if (lastData) renderTapCards(lastData);
+}
+
+function stopDrip() {
+  if (dripInterval) {
+    clearInterval(dripInterval);
+    dripInterval = null;
+  }
+  dripTap = null;
+  if (lastData) renderTapCards(lastData);
+}
+
 function initTapGridDelegation() {
   const grid = document.getElementById('tap-grid');
   if (!grid) return;
   grid.addEventListener('click', async (e) => {
+    const dripBtn = e.target.closest('.drip-btn');
+    if (dripBtn && !dripBtn.disabled) {
+      e.stopPropagation();
+      const card = dripBtn.closest('.tap-card');
+      const i = card ? parseInt(card.dataset.tapIndex, 10) : 0;
+      if (dripTap === i) {
+        stopDrip();
+      } else {
+        startDrip(i);
+      }
+      return;
+    }
     const pourBtn = e.target.closest('.pour-btn');
     if (pourBtn && !pourBtn.disabled) {
       e.stopPropagation();
@@ -484,7 +533,16 @@ function setActiveSettingsTab(tabId) {
 }
 
 function initSettingsTab(tabId) {
-  if (tabId === 'calibration') initCalibrationTab();
+  if (tabId === 'system') loadSystemConfig();
+  else if (tabId === 'calibration') initCalibrationTab();
+}
+
+async function loadSystemConfig() {
+  try {
+    const cfg = await apiFetch('/api/config');
+    const el = document.getElementById('leak-detection');
+    if (el && cfg) el.checked = cfg.leak_detection_enabled !== false;
+  } catch (_) {}
 }
 
 async function loadAlertsConfig() {
@@ -930,7 +988,7 @@ const calState = {
   lockedTap: -1,
   wrongPourTap: -1,
   pulses: 0,
-  currentK: 5100,
+  currentK: 2900,
   pourKFactor: null,
   simLock: false,
   continuousTap: -1,
@@ -939,7 +997,7 @@ const calState = {
   pollTimer: null,
 };
 
-const DEFAULT_K = 5100;
+const DEFAULT_K = 2900;
 let _calPolling = false;
 
 function calLoadDeduct() {
@@ -958,7 +1016,7 @@ function calSaveDeduct(v) {
 
 function calGetVolLiters() {
   const val = parseFloat(document.getElementById('cal-vol-slider')?.value) || 0;
-  return getUnits() === 'metric' ? val / 1000 : val * 0.0295735;
+  return val / 1000;
 }
 
 function calSetReady() {
@@ -976,23 +1034,20 @@ function calSetReady() {
 }
 
 function calSetMeasuredVolumeDefault() {
-  const useMetric = getUnits() === 'metric';
-  const defaultVal = useMetric ? 500 : 16;
   const el = document.getElementById('cal-vol-slider');
   if (el) {
     el.min = 0;
-    el.max = useMetric ? 1000 : 32;
-    el.step = useMetric ? 10 : 0.1;
-    el.value = defaultVal;
+    el.max = 1000;
+    el.step = 10;
+    el.value = 500;
   }
   calUpdateVolumeDisplay();
 }
 
 function calUpdateVolumeDisplay() {
-  const useMetric = getUnits() === 'metric';
   const val = parseFloat(document.getElementById('cal-vol-slider')?.value) || 0;
   const el = document.getElementById('cal-vol-display');
-  if (el) el.textContent = useMetric ? `${val} mL` : `${val.toFixed(1)} oz`;
+  if (el) el.textContent = `${val} mL`;
 }
 
 function calRender() {
@@ -1020,9 +1075,16 @@ function calRender() {
   const volL = calGetVolLiters();
   const newK = volL > 0 && s.pulses > 0 ? Math.max(100, Math.round(s.pulses / volL)) : DEFAULT_K;
   const kInput = document.getElementById('cal-k-input');
+  const calTap = s.lockedTap >= 0 ? s.lockedTap : s.selectedTap;
   if (kInput && document.activeElement !== kInput) {
-    kInput.value = s.lockedTap >= 0 ? newK : '';
-    kInput.disabled = s.lockedTap < 0;
+    if (s.lockedTap >= 0) {
+      kInput.value = newK;
+    } else if (s.selectedTap >= 0 && s.currentK != null) {
+      kInput.value = Math.round(s.currentK);
+    } else {
+      kInput.value = '';
+    }
+    kInput.disabled = calTap < 0;
   }
 
   const instructions = document.getElementById('cal-instructions');
@@ -1033,13 +1095,13 @@ function calRender() {
   } else if (s.wrongPourTap >= 0) {
     instructions.textContent = 'Pour only from the selected tap, or select a different tap.';
   } else if (s.selectedTap >= 0) {
-    instructions.textContent = 'Select a tap for calibration. Pour only from that tap.';
+    instructions.textContent = 'Pour from the selected tap to calibrate, or enter a K-factor and SAVE.';
   } else {
     instructions.textContent = 'Select a tap for calibration. Pour only from that tap.';
   }
 
-  document.getElementById('settings-cal-default').disabled = s.lockedTap < 0;
-  document.getElementById('settings-cal-save').disabled = s.lockedTap < 0;
+  document.getElementById('settings-cal-default').disabled = calTap < 0;
+  document.getElementById('settings-cal-save').disabled = calTap < 0;
 }
 
 function initCalibrationTab() {
@@ -1059,7 +1121,7 @@ function initCalibrationTab() {
     col.appendChild(tapBtn);
     const simDiv = document.createElement('div');
     simDiv.className = 'cal-sim-buttons' + (simModeEnabled ? '' : ' hidden');
-    const pintLiters = getUnits() === 'metric' ? 0.5 : 0.473;
+    const pintLiters = 0.5;
     const pintBtn = document.createElement('button');
     pintBtn.type = 'button';
     pintBtn.className = 'cal-pour-btn cal-pour-pint';
@@ -1270,11 +1332,12 @@ async function resetCalibration() {
 }
 
 async function setCalToDefault() {
-  if (calState.lockedTap < 0) return;
+  const calTap = calState.lockedTap >= 0 ? calState.lockedTap : calState.selectedTap;
+  if (calTap < 0) return;
   try {
     const cfg = await apiFetch('/api/config');
     const kf = [...(cfg?.k_factors || [DEFAULT_K, DEFAULT_K, DEFAULT_K, DEFAULT_K, DEFAULT_K])];
-    kf[calState.lockedTap] = DEFAULT_K;
+    kf[calTap] = DEFAULT_K;
     await apiFetch('/api/config', { method: 'PUT', body: JSON.stringify({ k_factors: kf }) });
     await apiFetch('/api/calibration/reset', { method: 'POST' });
     calSetReady();
@@ -1284,7 +1347,8 @@ async function setCalToDefault() {
 }
 
 async function saveCalibration() {
-  if (calState.lockedTap < 0) return;
+  const calTap = calState.lockedTap >= 0 ? calState.lockedTap : calState.selectedTap;
+  if (calTap < 0) return;
   const btn = document.getElementById('settings-cal-save');
   try {
     setBtnSaving(btn, true);
@@ -1292,7 +1356,7 @@ async function saveCalibration() {
     const kVal = Math.max(100, parseInt(document.getElementById('cal-k-input')?.value, 10) || DEFAULT_K);
     const cfg = await apiFetch('/api/config');
     const kf = [...(cfg?.k_factors || [DEFAULT_K, DEFAULT_K, DEFAULT_K, DEFAULT_K, DEFAULT_K])];
-    kf[calState.lockedTap] = kVal;
+    kf[calTap] = kVal;
     await apiFetch('/api/config', { method: 'PUT', body: JSON.stringify({ k_factors: kf }) });
     calState.deductInventory = document.getElementById('cal-deduct-inventory')?.checked ?? true;
     calSaveDeduct(calState.deductInventory);
@@ -1432,18 +1496,23 @@ async function openKegEdit(kegId) {
       .join('');
 
   const nameReadonly = document.getElementById('keg-name-readonly');
+  const useImperial = getUnits() === 'imperial';
+  const capUnitSpan = document.getElementById('max-cap-unit');
+  if (capUnitSpan) capUnitSpan.textContent = useImperial ? 'Gal' : 'L';
   if (kegId && kegData) {
     const keg = kegData;
     idInput.value = keg.id;
     nameReadonly.textContent = keg.name || keg.title || 'Unknown';
     beverageSelect.value = keg.beverage_id || '';
-    let maxCap = keg.maximum_full_volume_liters ?? 19;
+    let maxCapL = keg.maximum_full_volume_liters ?? 19;
     let tare = keg.tare_weight_kg ?? 4.5;
     let total = keg.starting_total_weight_kg ?? keg.tare_weight_kg;
     if (total == null || total === 0) {
       total = (keg.starting_volume_liters ?? 18.9) * DENSITY_SG + tare;
     }
-    maxCapInput.value = roundToOneDecimal(maxCap);
+    maxCapInput.value = useImperial
+      ? (maxCapL * LITERS_TO_GAL).toFixed(2)
+      : roundToOneDecimal(maxCapL);
     tareInput.value = roundToOneDecimal(tare);
     totalInput.value = roundToOneDecimal(total);
     tapSelect.value = String(keg.tap_index ?? -1);
@@ -1452,7 +1521,7 @@ async function openKegEdit(kegId) {
     form.reset();
     nameReadonly.textContent = '';
     beverageSelect.value = '';
-    maxCapInput.value = '19';
+    maxCapInput.value = useImperial ? (19 * LITERS_TO_GAL).toFixed(2) : '19';
     tareInput.value = '4.5';
     totalInput.value = '23.5';
     tapSelect.value = '-1';
@@ -1488,7 +1557,8 @@ async function saveKeg(e) {
   const nameReadonly = document.getElementById('keg-name-readonly');
   const kegName = nameReadonly.textContent.trim() || 'New Keg';
   const beverageSelect = document.getElementById('keg-beverage');
-  const maxCap = parseFloat(roundToOneDecimal(document.getElementById('keg-max-capacity').value)) || 19;
+  const maxCapRaw = parseFloat(document.getElementById('keg-max-capacity').value) || 19;
+  const maxCap = getUnits() === 'imperial' ? maxCapRaw / LITERS_TO_GAL : maxCapRaw;
   const tare = parseFloat(roundToOneDecimal(document.getElementById('keg-tare').value)) || 4.5;
   const total = parseFloat(roundToOneDecimal(document.getElementById('keg-total-weight').value)) || 23.5;
   const tapSelect = document.getElementById('keg-tap');
@@ -1789,8 +1859,8 @@ async function openCalibrateModal(tapIndex) {
     calibrateKegId = kegId;
     const startVol = parseFloat(keg.starting_volume_liters ?? keg.calculated_starting_volume_liters ?? 0);
     const lifetimePulses = tapData.lifetime_pulses ?? 0;
-    const kFactors = config?.k_factors ?? [5100, 5100, 5100, 5100, 5100];
-    const oldK = kFactors[tapIndex] ?? 5100;
+    const kFactors = config?.k_factors ?? [2900, 2900, 2900, 2900, 2900];
+    const oldK = kFactors[tapIndex] ?? 2900;
     const newK = startVol > 0 && lifetimePulses > 0 ? lifetimePulses / startVol : 0;
 
     document.getElementById('calibrate-title').textContent = `Calibration Data for ${keg.title || keg.name}`;
@@ -1820,7 +1890,7 @@ async function commitCalibration() {
 
   try {
     const config = await apiFetch('/api/config');
-    const kFactors = [...(config?.k_factors ?? [5100, 5100, 5100, 5100, 5100])];
+    const kFactors = [...(config?.k_factors ?? [2900, 2900, 2900, 2900, 2900])];
     kFactors[calibrateTapIndex] = newK;
     await apiFetch('/api/config', { method: 'PUT', body: JSON.stringify({ k_factors: kFactors }) });
 
@@ -2073,6 +2143,15 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTapCards(lastData);
         updateHeader(lastData);
       }
+      updateAlertsSliderLabels();
+      const capUnitSpan = document.getElementById('max-cap-unit');
+      if (capUnitSpan) capUnitSpan.textContent = unitsEl.value === 'imperial' ? 'Gal' : 'L';
+    });
+  }
+  const leakDetEl = document.getElementById('leak-detection');
+  if (leakDetEl) {
+    leakDetEl.addEventListener('change', async () => {
+      await putConfig({ leak_detection_enabled: leakDetEl.checked });
     });
   }
   const activeTapsEl = document.getElementById('active-taps');
@@ -2159,16 +2238,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.getElementById('cal-vol-minus').addEventListener('click', () => {
     const el = document.getElementById('cal-vol-slider');
-    const step = getUnits() === 'metric' ? 10 : 0.1;
-    el.value = Math.max(0, (parseFloat(el.value) || 0) - step);
+    el.value = Math.max(0, (parseFloat(el.value) || 0) - 10);
     calUpdateVolumeDisplay();
     calRender();
   });
   document.getElementById('cal-vol-plus').addEventListener('click', () => {
     const el = document.getElementById('cal-vol-slider');
-    const step = getUnits() === 'metric' ? 10 : 0.1;
-    const max = getUnits() === 'metric' ? 1000 : 32;
-    el.value = Math.min(max, (parseFloat(el.value) || 0) + step);
+    el.value = Math.min(1000, (parseFloat(el.value) || 0) + 10);
     calUpdateVolumeDisplay();
     calRender();
   });

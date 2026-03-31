@@ -1,4 +1,4 @@
-/* BatchFlow — Brewing workflow board served from KegLevel Pico */
+/* BatchFlow — Brewing workflow board served from KegLevel Brain */
 "use strict";
 
 /* ------------------------------------------------------------------ */

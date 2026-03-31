@@ -39,10 +39,11 @@
       { id: uuid(), name: "Keg 05", title: "Keg 05", beverage_id: bevs[4].id, beverage_name: bevs[4].name, style: bevs[4].style, abv: bevs[4].abv, starting_volume_liters: 9.46, maximum_full_volume_liters: 9.46, tare_weight_kg: 3.6, starting_total_weight_kg: 13.2, current_dispensed_liters: 7.06, total_dispensed_pulses: 36006, tap_index: 4, tapped_date: "2026-02-20", fill_date: "2026-02-19", notes: "" },
     ];
     const cfg = {
-      k_factors: [5100, 5100, 5100, 5100, 5100],
+      k_factors: [2900, 2900, 2900, 2900, 2900],
       active_taps: 5,
       tap_labels: ["Tap 1", "Tap 2", "Tap 3", "Tap 4", "Tap 5"],
       mdns_hostname: "keglevel",
+      leak_detection_enabled: true,
     };
     const bf = {
       columns: {
@@ -107,6 +108,7 @@
   /*  Pour state (per-tap pouring flag with auto-clear)                  */
   /* ------------------------------------------------------------------ */
   const pouringUntil = [0, 0, 0, 0, 0];
+  let leak_warnings = [false, false, false, false, false];
 
   /* ------------------------------------------------------------------ */
   /*  Helpers                                                            */
@@ -189,6 +191,7 @@
         version: "1.5.0-demo",
         calibration: { standby: false, locked_tap: -1, pulses: 0 },
         wifi_mode: "sta",
+        leak_warnings: leak_warnings.slice(),
       });
     }
 
@@ -298,7 +301,7 @@
           index: i,
           active: i < config.active_taps,
           label: config.tap_labels[i] || `Tap ${i + 1}`,
-          k_factor: config.k_factors[i] || 5100,
+          k_factor: config.k_factors[i] || 2900,
           keg_id: keg ? keg.id : "",
           keg_name: keg ? (keg.title || keg.name) : "",
           dispensed_liters: keg ? keg.current_dispensed_liters : 0,
@@ -333,7 +336,7 @@
         const remaining = Math.max(0, keg.starting_volume_liters - keg.current_dispensed_liters);
         const actual = Math.min(liters, remaining);
         keg.current_dispensed_liters += actual;
-        keg.total_dispensed_pulses += Math.round(actual * (config.k_factors[ti] || 5100));
+        keg.total_dispensed_pulses += Math.round(actual * (config.k_factors[ti] || 2900));
         pouringUntil[ti] = Date.now() + 1500;
         persist();
       }
@@ -387,6 +390,16 @@
     }
     if (path === "/api/calibration/reset" && method === "POST") {
       return ok({ status: "ok" });
+    }
+
+    /* --- Test drip (leak warning sim) ----------------------------- */
+    if (method === "POST" && path === "/api/test/drip") {
+      const tap = body != null && body.tap !== undefined ? Number(body.tap) : 0;
+      leak_warnings[tap] = true;
+      setTimeout(() => {
+        leak_warnings[tap] = false;
+      }, 60000);
+      return ok({ status: "ok", tap: tap });
     }
 
     /* --- History (empty) ----------------------------------------- */
