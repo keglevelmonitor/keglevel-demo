@@ -195,6 +195,11 @@ function updateTapCardDOM(card, d) {
   card.querySelectorAll('.pour-btn').forEach((btn) => {
     btn.disabled = !d.active || !d.hasKeg;
   });
+  const dripBtn = card.querySelector('.drip-btn');
+  if (dripBtn) {
+    const i = parseInt(card.dataset.tapIndex, 10);
+    dripBtn.classList.toggle('dripping', dripTap === i);
+  }
 }
 
 function renderTapCards(data) {
@@ -274,9 +279,6 @@ async function pollOnce() {
     renderTapCards(data);
     updateHeader(data);
     updateApModeNotice(data);
-    if (dripTap !== null && data.leak_warnings && data.leak_warnings[dripTap]) {
-      stopDrip();
-    }
   } else {
     consecutiveFailures++;
     if (connectionState === 'connected' && consecutiveFailures >= OFFLINE_AFTER_FAILURES) {
@@ -319,11 +321,23 @@ function startDrip(tapIndex) {
 }
 
 function stopDrip() {
+  const tap = dripTap;
   if (dripInterval) {
     clearInterval(dripInterval);
     dripInterval = null;
   }
   dripTap = null;
+  if (tap !== null) {
+    const base = getPicoBaseUrl();
+    if (base) {
+      fetch(`${base}/api/test/drip`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tap, clear: true }),
+        signal: AbortSignal.timeout(3000),
+      }).catch(() => {});
+    }
+  }
   if (lastData) renderTapCards(lastData);
 }
 

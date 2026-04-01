@@ -395,10 +395,18 @@
     /* --- Test drip (leak warning sim) ----------------------------- */
     if (method === "POST" && path === "/api/test/drip") {
       const tap = body != null && body.tap !== undefined ? Number(body.tap) : 0;
-      leak_warnings[tap] = true;
-      setTimeout(() => {
+      if (body && body.clear) {
         leak_warnings[tap] = false;
-      }, 60000);
+        if (window._dripAccum) window._dripAccum[tap] = 0;
+        return ok({ status: "ok", tap: tap, cleared: true });
+      }
+      if (!leak_warnings[tap]) {
+        if (!window._dripAccum) window._dripAccum = [0, 0, 0, 0, 0];
+        window._dripAccum[tap] += Number(body.pulses || 5);
+        if (window._dripAccum[tap] >= 30) {
+          leak_warnings[tap] = true;
+        }
+      }
       return ok({ status: "ok", tap: tap });
     }
 
