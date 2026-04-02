@@ -55,7 +55,41 @@
       titles: { rotation: "On Rotation", deck: "On Deck", fermenting: "Fermenting", finishing: "Lagering / Finishing" },
       collapsed: {},
     };
-    return { beverages: bevs, kegs: kgs, config: cfg, batchflow: bf };
+    const hist = _seedHistory(bevs, kgs);
+    return { beverages: bevs, kegs: kgs, config: cfg, batchflow: bf, history: hist };
+  }
+
+  function _seedHistory(bevs, kgs) {
+    const entries = [];
+    const now = Math.floor(Date.now() / 1000);
+    const dayS = 86400;
+    const pourData = [
+      { tap: 0, vol: 0.47 }, { tap: 1, vol: 0.33 }, { tap: 2, vol: 0.50 },
+      { tap: 0, vol: 0.25 }, { tap: 3, vol: 0.47 }, { tap: 4, vol: 0.33 },
+      { tap: 0, vol: 0.50 }, { tap: 2, vol: 0.47 }, { tap: 1, vol: 0.25 },
+      { tap: 3, vol: 0.50 }, { tap: 0, vol: 0.33 }, { tap: 4, vol: 0.47 },
+      { tap: 2, vol: 0.25 }, { tap: 1, vol: 0.50 }, { tap: 0, vol: 0.47 },
+      { tap: 3, vol: 0.33 }, { tap: 4, vol: 0.50 }, { tap: 2, vol: 0.47 },
+      { tap: 0, vol: 0.25 }, { tap: 1, vol: 0.33 }, { tap: 3, vol: 0.50 },
+      { tap: 4, vol: 0.25 }, { tap: 0, vol: 0.50 }, { tap: 2, vol: 0.33 },
+      { tap: 1, vol: 0.47 }, { tap: 3, vol: 0.25 }, { tap: 0, vol: 0.33 },
+      { tap: 4, vol: 0.50 }, { tap: 2, vol: 0.47 }, { tap: 1, vol: 0.25 },
+    ];
+    for (let i = 0; i < pourData.length; i++) {
+      const p = pourData[i];
+      const keg = kgs.find(k => k.tap_index === p.tap);
+      const bev = keg ? bevs.find(b => b.id === keg.beverage_id) : null;
+      const ts = now - (pourData.length - i) * (dayS * 0.5 + Math.floor(Math.random() * dayS * 0.4));
+      entries.push({
+        timestamp: ts,
+        tap_index: p.tap,
+        keg_name: keg ? (keg.title || keg.name) : "",
+        beverage_name: bev ? bev.name : "",
+        volume_liters: p.vol,
+        duration_s: Math.round(p.vol * 60 + Math.random() * 15),
+      });
+    }
+    return entries;
   }
 
   /* ------------------------------------------------------------------ */
@@ -66,7 +100,10 @@
       const raw = localStorage.getItem(STORE_KEY);
       if (raw) {
         const s = JSON.parse(raw);
-        if (s.beverages && s.kegs && s.config && s.batchflow) return s;
+        if (s.beverages && s.kegs && s.config && s.batchflow) {
+          if (!s.history) s.history = [];
+          return s;
+        }
       }
     } catch (_) {}
     return null;
@@ -92,6 +129,7 @@
   const kegs = defaults.kegs;
   const config = defaults.config;
   let batchflow = defaults.batchflow;
+  const history = defaults.history || [];
 
   if (!saved) persist();
 
@@ -338,6 +376,15 @@
         keg.current_dispensed_liters += actual;
         keg.total_dispensed_pulses += Math.round(actual * (config.k_factors[ti] || 2900));
         pouringUntil[ti] = Date.now() + 1500;
+        const bev = keg.beverage_id ? bevById(keg.beverage_id) : null;
+        history.push({
+          timestamp: Math.floor(Date.now() / 1000),
+          tap_index: ti,
+          keg_name: keg.title || keg.name || "",
+          beverage_name: bev ? bev.name : (keg.beverage_name || ""),
+          volume_liters: actual,
+          duration_s: Math.round(actual * 60 + Math.random() * 15),
+        });
         persist();
       }
       return ok({ status: "ok", tap: ti, adjusted_liters: liters });
@@ -410,9 +457,9 @@
       return ok({ status: "ok", tap: tap });
     }
 
-    /* --- History (empty) ----------------------------------------- */
+    /* --- History -------------------------------------------------- */
     if (method === "GET" && path === "/api/history") {
-      return ok([]);
+      return ok(history);
     }
 
     /* --- Fallback ------------------------------------------------ */

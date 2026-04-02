@@ -518,6 +518,183 @@ function navigateToSettings() {
   setActiveSettingsTab('system');
 }
 
+function navigateToLog() {
+  cleanupSettings();
+  showScreen('log-screen');
+  setActiveNav('btn-nav-log');
+  resumePolling();
+  loadLogData();
+}
+
+// ---------------------------------------------------------------------------
+// Pour Log
+// ---------------------------------------------------------------------------
+
+let _logData = [];
+let _logSortKey = 'timestamp';
+let _logSortDesc = true;
+let _logGraphView = 'day';
+
+const TAP_COLORS = ['#ffc107', '#4fc3f7', '#81c784', '#e57373', '#ba68c8'];
+
+async function loadLogData() {
+  try {
+    const data = await apiFetch('/api/history');
+    _logData = data || [];
+  } catch (_) {
+    _logData = [];
+  }
+  renderLogTable();
+  renderLogGraph();
+}
+
+function renderLogTable() {
+  const tbody = document.getElementById('log-tbody');
+  if (!tbody) return;
+  if (_logData.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="log-no-data">No pour history yet.</td></tr>';
+    return;
+  }
+  const sorted = [..._logData].sort((a, b) => {
+    let va = a[_logSortKey], vb = b[_logSortKey];
+    if (_logSortKey === 'volume_liters' || _logSortKey === 'duration_s' || _logSortKey === 'tap_index') {
+      va = parseFloat(va) || 0;
+      vb = parseFloat(vb) || 0;
+    } else {
+      va = String(va || '').toLowerCase();
+      vb = String(vb || '').toLowerCase();
+    }
+    if (va < vb) return _logSortDesc ? 1 : -1;
+    if (va > vb) return _logSortDesc ? -1 : 1;
+    return 0;
+  });
+  const imperial = getUnits() === 'imperial';
+  tbody.innerHTML = sorted.map(e => {
+    const ts = e.timestamp ? new Date(e.timestamp * 1000) : null;
+    const dateStr = ts ? ts.toLocaleDateString() + ' ' + ts.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : '—';
+    const tap = e.tap_index != null ? 'Tap ' + (e.tap_index + 1) : '—';
+    const vol = e.volume_liters != null
+      ? (imperial ? (e.volume_liters * LITERS_TO_GAL).toFixed(2) + ' Gal' : parseFloat(e.volume_liters).toFixed(2) + ' L')
+      : '—';
+    const dur = e.duration_s != null ? Math.floor(e.duration_s / 60) + ':' + String(Math.round(e.duration_s % 60)).padStart(2, '0') : '—';
+    return `<tr>
+      <td>${dateStr}</td>
+      <td>${tap}</td>
+      <td>${escapeHtml(e.keg_name || '—')}</td>
+      <td>${escapeHtml(e.beverage_name || '—')}</td>
+      <td>${vol}</td>
+      <td>${dur}</td>
+    </tr>`;
+  }).join('');
+}
+
+function logSortBy(key) {
+  if (_logSortKey === key) {
+    _logSortDesc = !_logSortDesc;
+  } else {
+    _logSortKey = key;
+    _logSortDesc = key === 'timestamp';
+  }
+  document.querySelectorAll('.log-table th.sortable').forEach(th => {
+    th.classList.remove('sort-active', 'sort-desc');
+    if (th.dataset.sort === _logSortKey) {
+      th.classList.add('sort-active');
+      if (_logSortDesc) th.classList.add('sort-desc');
+    }
+  });
+  renderLogTable();
+}
+
+function renderLogGraph() {
+  const container = document.getElementById('log-graph');
+  if (!container) return;
+  if (_logData.length === 0) {
+    container.innerHTML = '<div class="log-graph-empty">No data to graph.</div>';
+    return;
+  }
+  if (_logGraphView === 'day') {
+    renderGraphByDay(container);
+  } else {
+    renderGraphByTap(container);
+  }
+}
+
+function renderGraphByDay(container) {
+  const buckets = {};
+  _logData.forEach(e => {
+    if (!e.timestamp) return;
+    const d = new Date(e.timestamp * 1000);
+    const key = d.toISOString().slice(0, 10);
+    buckets[key] = (buckets[key] || 0) + (parseFloat(e.volume_liters) || 0);
+  });
+  const days = Object.keys(buckets).sort().slice(-14);
+  if (days.length === 0) {
+    container.innerHTML = '<div class="log-graph-empty">No data to graph.</div>';
+    return;
+  }
+  const imperial = getUnits() === 'imperial';
+  const maxVal = Math.max(...days.map(d => buckets[d]));
+  container.innerHTML = days.map(day => {
+    const raw = buckets[day];
+    const val = imperial ? (raw * LITERS_TO_GAL).toFixed(1) + ' G' : raw.toFixed(1) + ' L';
+    const pct = maxVal > 0 ? (raw / maxVal * 100) : 0;
+    const label = day.slice(5);
+    return `<div class="log-graph-bar-row">
+      <span class="log-graph-label">${label}</span>
+      <div class="log-graph-track"><div class="log-graph-fill" style="width:${pct}%;background:#ffc107"></div></div>
+      <span class="log-graph-val">${val}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderGraphByTap(container) {
+  const totals = [0, 0, 0, 0, 0];
+  _logData.forEach(e => {
+    const ti = parseInt(e.tap_index);
+    if (ti >= 0 && ti <= 4) totals[ti] += parseFloat(e.volume_liters) || 0;
+  });
+  const imperial = getUnits() === 'imperial';
+  const maxVal = Math.max(...totals);
+  if (maxVal === 0) {
+    container.innerHTML = '<div class="log-graph-empty">No data to graph.</div>';
+    return;
+  }
+  container.innerHTML = totals.map((raw, i) => {
+    const val = imperial ? (raw * LITERS_TO_GAL).toFixed(1) + ' G' : raw.toFixed(1) + ' L';
+    const pct = maxVal > 0 ? (raw / maxVal * 100) : 0;
+    return `<div class="log-graph-bar-row">
+      <span class="log-graph-label">Tap ${i + 1}</span>
+      <div class="log-graph-track"><div class="log-graph-fill" style="width:${pct}%;background:${TAP_COLORS[i]}"></div></div>
+      <span class="log-graph-val">${val}</span>
+    </div>`;
+  }).join('');
+}
+
+function downloadLogCsv() {
+  if (_logData.length === 0) return;
+  const imperial = getUnits() === 'imperial';
+  const volHeader = imperial ? 'Volume (Gal)' : 'Volume (L)';
+  const header = ['Date/Time', 'Tap', 'Keg', 'Beverage', volHeader, 'Duration (s)'];
+  const rows = _logData.map(e => {
+    const ts = e.timestamp ? new Date(e.timestamp * 1000).toISOString() : '';
+    const tap = e.tap_index != null ? 'Tap ' + (e.tap_index + 1) : '';
+    const vol = e.volume_liters != null
+      ? (imperial ? (e.volume_liters * LITERS_TO_GAL).toFixed(3) : parseFloat(e.volume_liters).toFixed(3))
+      : '';
+    const dur = e.duration_s != null ? e.duration_s.toFixed(1) : '';
+    return [ts, tap, e.keg_name || '', e.beverage_name || '', vol, dur]
+      .map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',');
+  });
+  const csv = [header.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'keglevel-pour-log.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ---------------------------------------------------------------------------
 // Settings: ALERTS, UPDATES, ABOUT, CALIBRATION
 // ---------------------------------------------------------------------------
@@ -569,8 +746,7 @@ async function loadAlertsConfig() {
       : 'none';
     document.getElementById('alerts-api-key').value = cfg.mailgun_api_key === '***' ? '' : (cfg.mailgun_api_key || '');
     document.getElementById('alerts-domain').value = cfg.mailgun_domain || '';
-    document.getElementById('alerts-from').value = cfg.from_email || '';
-    document.getElementById('alerts-to').value = cfg.to_email || '';
+    document.getElementById('alerts-email').value = cfg.to_email || cfg.from_email || '';
     const lowVol = parseFloat(cfg.low_volume_threshold_liters ?? 0);
     const lowTemp = parseFloat(cfg.low_temp_threshold_f ?? 27);
     const highTemp = parseFloat(cfg.high_temp_threshold_f ?? 200);
@@ -620,8 +796,8 @@ async function saveAlertsConfig() {
       push_enabled: freq !== 'none',
       push_interval: freq === 'none' ? 'daily' : freq,
       mailgun_domain: document.getElementById('alerts-domain').value.trim(),
-      from_email: document.getElementById('alerts-from').value.trim(),
-      to_email: document.getElementById('alerts-to').value.trim(),
+      from_email: document.getElementById('alerts-email').value.trim(),
+      to_email: document.getElementById('alerts-email').value.trim(),
       conditional_enabled: conditionalEnabled,
       low_volume_threshold_liters: lowVol,
       low_temp_threshold_f: lowTemp,
@@ -641,7 +817,7 @@ async function saveAlertsConfig() {
 async function sendTestAlert() {
   const btn = document.getElementById('settings-alerts-test');
   try {
-    setBtnSaving(btn, true);
+    setBtnSaving(btn, true, 'Sending…');
     await apiFetch('/api/alerts/test', { method: 'POST' });
     alert('Test email sent. Check your inbox.');
   } catch (e) {
@@ -1495,7 +1671,8 @@ async function openKegEdit(kegId) {
     kegId ? apiFetch(`/api/kegs/${kegId}`) : Promise.resolve(null),
   ]);
   beverageSelect.innerHTML = '<option value="">— None —</option>' +
-    (beverages || []).map((b) => `<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('');
+    (beverages || []).sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+    .map((b) => `<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('');
 
   const tapByKeg = {};
   (kegs || []).forEach((k) => {
@@ -1513,7 +1690,7 @@ async function openKegEdit(kegId) {
       })
       .join('');
 
-  const nameReadonly = document.getElementById('keg-name-readonly');
+  const nameInput = document.getElementById('keg-name');
   const useImperial = getUnits() === 'imperial';
   const capUnitSpan = document.getElementById('max-cap-unit');
   if (capUnitSpan) capUnitSpan.textContent = useImperial ? 'Gal' : 'L';
@@ -1525,7 +1702,7 @@ async function openKegEdit(kegId) {
   if (kegId && kegData) {
     const keg = kegData;
     idInput.value = keg.id;
-    nameReadonly.textContent = keg.name || keg.title || 'Unknown';
+    nameInput.value = keg.name || keg.title || 'Unknown';
     beverageSelect.value = keg.beverage_id || '';
     let maxCapL = keg.maximum_full_volume_liters ?? 19;
     let tare = keg.tare_weight_kg ?? 4.5;
@@ -1546,7 +1723,14 @@ async function openKegEdit(kegId) {
   } else {
     idInput.value = '';
     form.reset();
-    nameReadonly.textContent = '';
+    const usedNums = new Set();
+    (kegs || []).forEach((k) => {
+      const m = (k.name || k.title || '').match(/^Keg\s+(\d+)$/i);
+      if (m) usedNums.add(parseInt(m[1], 10));
+    });
+    let nextNum = 1;
+    while (usedNums.has(nextNum)) nextNum++;
+    nameInput.value = `Keg ${String(nextNum).padStart(2, '0')}`;
     beverageSelect.value = '';
     maxCapInput.value = useImperial ? (19 * LITERS_TO_GAL).toFixed(2) : '19';
     tareInput.value = useImperial ? (4.5 * KG_TO_LB).toFixed(1) : '4.5';
@@ -1581,8 +1765,8 @@ async function saveKeg(e) {
   setBtnSaving(saveBtn, true);
   const idInput = document.getElementById('keg-id');
   const kegId = idInput.value;
-  const nameReadonly = document.getElementById('keg-name-readonly');
-  const kegName = nameReadonly.textContent.trim() || 'New Keg';
+  const nameInput = document.getElementById('keg-name');
+  const kegName = nameInput.value.trim() || 'New Keg';
   const beverageSelect = document.getElementById('keg-beverage');
   const imperial = getUnits() === 'imperial';
   const maxCapRaw = parseFloat(document.getElementById('keg-max-capacity').value) || 19;
@@ -1604,6 +1788,8 @@ async function saveKeg(e) {
   const startingVolumeLiters = liquidKg / DENSITY_SG;
 
   const payload = {
+    name: kegName,
+    title: kegName,
     beverage_id: beverageId,
     beverage_name: beverageName,
     style,
@@ -1613,10 +1799,6 @@ async function saveKeg(e) {
     starting_total_weight_kg: total,
     starting_volume_liters: startingVolumeLiters,
   };
-  if (!kegId) {
-    payload.name = kegName || 'New Keg';
-    payload.title = kegName || 'New Keg';
-  }
 
   let created = null;
   try {
@@ -2003,10 +2185,11 @@ async function zeroKegOnPico(kegId) {
 
 let pendingDelete = null;
 
-function confirmDeleteKeg(kegId) {
+function confirmDeleteKeg(kegId, kegName) {
   pendingDelete = { type: 'keg', id: kegId };
+  const displayName = kegName || kegId;
   document.getElementById('modal-confirm-text').textContent =
-    `Delete keg "${kegId}"? Any tap assignment will be removed.`;
+    `Delete keg "${displayName}"? Any tap assignment will be removed.`;
   document.getElementById('modal-confirm').classList.remove('hidden');
 }
 
@@ -2077,7 +2260,12 @@ async function doConfirmDelete() {
 function initInventory() {
   document.getElementById('keg-list')?.addEventListener('click', (e) => {
     const delBtn = e.target.closest('.btn-delete[data-keg-id]');
-    if (delBtn) { confirmDeleteKeg(delBtn.dataset.kegId); return; }
+    if (delBtn) {
+      const row = delBtn.closest('.list-row-keg');
+      const name = row?.querySelector('.row-name')?.textContent || '';
+      confirmDeleteKeg(delBtn.dataset.kegId, name);
+      return;
+    }
     const row = e.target.closest('.list-row-keg[data-keg-id]');
     if (row) openKegEdit(row.dataset.kegId);
   });
@@ -2235,6 +2423,21 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-nav-kegs').addEventListener('click', navigateToKegs);
   document.getElementById('btn-nav-beverages').addEventListener('click', navigateToBeverages);
   document.getElementById('btn-nav-settings').addEventListener('click', navigateToSettings);
+  document.getElementById('btn-nav-log').addEventListener('click', navigateToLog);
+
+  document.querySelectorAll('.log-table th.sortable').forEach(th => {
+    th.addEventListener('click', () => logSortBy(th.dataset.sort));
+  });
+  document.querySelectorAll('.log-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.log-toggle-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _logGraphView = btn.dataset.view;
+      renderLogGraph();
+    });
+  });
+  document.getElementById('btn-log-download')?.addEventListener('click', downloadLogCsv);
+
   document.querySelectorAll('.settings-tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => setActiveSettingsTab(btn.dataset.settingsTab));
   });
@@ -2257,6 +2460,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (t === 'calibration') anchor = 'calibration';
         else anchor = 'system';
       }
+      else if (id === 'btn-nav-log') anchor = 'toc';
     }
     window.open('help.html#' + anchor, '_blank');
   });

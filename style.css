@@ -536,10 +536,10 @@ body {
 }
 
 
-.keg-name-readonly {
+.keg-name-input {
   margin: 0 0 16px 0;
   padding: 10px 12px;
-  background: #252525;
+  background: #1e1e1e;
   border: 1px solid #444;
   border-radius: 4px;
   color: #e0e0e0;
@@ -1437,5 +1437,127 @@ body {
 }
 .modal-splash .modal-actions {
   justify-content: center;
+}
+
+
+/* ---- Pour Log ---- */
+
+.log-graph-toggle {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.log-toggle-btn {
+  background: #2a2a2a;
+  color: #aaa;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.log-toggle-btn.active {
+  background: #3a3a3a;
+  color: #ffc107;
+  border-color: #ffc107;
+}
+
+.log-graph {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+  min-height: 120px;
+}
+.log-graph-bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+.log-graph-label {
+  width: 80px;
+  text-align: right;
+  padding-right: 8px;
+  color: #aaa;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.log-graph-track {
+  flex: 1;
+  height: 18px;
+  background: #222;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+.log-graph-fill {
+  height: 100%;
+  border-radius: 3px;
+  min-width: 2px;
+}
+.log-graph-val {
+  width: 60px;
+  text-align: right;
+  padding-left: 6px;
+  color: #ccc;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.log-graph-empty {
+  color: #666;
+  font-size: 13px;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.log-table-wrap {
+  overflow-x: auto;
+}
+.log-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.log-table th {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 2px solid #444;
+  color: #aaa;
+  font-weight: 600;
+  white-space: nowrap;
+  user-select: none;
+}
+.log-table th.sortable {
+  cursor: pointer;
+}
+.log-table th.sortable:hover {
+  color: #fff;
+}
+.log-table th.sort-active {
+  color: #ffc107;
+}
+.log-table th.sort-active::after {
+  content: ' \25B2';
+  font-size: 10px;
+}
+.log-table th.sort-active.sort-desc::after {
+  content: ' \25BC';
+}
+.log-table td {
+  padding: 6px;
+  border-bottom: 1px solid #2a2a2a;
+  color: #ddd;
+}
+.log-table tr:hover td {
+  background: #252525;
+}
+.log-table .log-no-data {
+  text-align: center;
+  color: #666;
+  padding: 24px 6px;
 }
 
