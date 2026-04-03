@@ -695,6 +695,24 @@ function downloadLogCsv() {
   URL.revokeObjectURL(url);
 }
 
+function showClearLogModal() {
+  document.getElementById('modal-clear-log').classList.remove('hidden');
+}
+
+function closeClearLogModal() {
+  document.getElementById('modal-clear-log').classList.add('hidden');
+}
+
+async function confirmClearLog() {
+  closeClearLogModal();
+  try {
+    await apiFetch('/api/history', { method: 'DELETE' });
+    _logData = [];
+    renderLogTable();
+    renderLogGraph();
+  } catch (_) {}
+}
+
 // ---------------------------------------------------------------------------
 // Settings: ALERTS, UPDATES, ABOUT, CALIBRATION
 // ---------------------------------------------------------------------------
@@ -2437,6 +2455,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   document.getElementById('btn-log-download')?.addEventListener('click', downloadLogCsv);
+  document.getElementById('btn-log-clear')?.addEventListener('click', showClearLogModal);
+  document.getElementById('btn-clear-log-cancel')?.addEventListener('click', closeClearLogModal);
+  document.getElementById('btn-clear-log-confirm')?.addEventListener('click', confirmClearLog);
 
   document.querySelectorAll('.settings-tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => setActiveSettingsTab(btn.dataset.settingsTab));

@@ -129,7 +129,9 @@
   const kegs = defaults.kegs;
   const config = defaults.config;
   let batchflow = defaults.batchflow;
-  const history = defaults.history || [];
+  const history = (defaults.history && defaults.history.length > 0)
+    ? defaults.history
+    : _seedHistory(beverages, kegs);
 
   if (!saved) persist();
 
@@ -460,6 +462,11 @@
     /* --- History -------------------------------------------------- */
     if (method === "GET" && path === "/api/history") {
       return ok(history);
+    }
+    if (method === "DELETE" && path === "/api/history") {
+      history.length = 0;
+      persist();
+      return ok({ status: "ok" });
     }
 
     /* --- Fallback ------------------------------------------------ */

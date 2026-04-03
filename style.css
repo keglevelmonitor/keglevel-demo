@@ -425,6 +425,16 @@ body {
   background: #fbbf24;
 }
 
+.sub-btn-red {
+  background: #991b1b;
+  color: #fff;
+  border: none;
+}
+
+.sub-btn-red:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
 /* Screen headers (Kegs, Beverages) */
 .screen-header {
   padding: 16px;

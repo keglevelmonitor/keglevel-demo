@@ -27,7 +27,7 @@
       <button id="btn-nav-kegs" class="nav-btn">KEGS</button>
       <button id="btn-nav-beverages" class="nav-btn">BEVERAGES</button>
       <button id="btn-nav-settings" class="nav-btn">SETTINGS</button>
-      <button id="btn-nav-log" class="nav-btn">LOG</button>
+      <button id="btn-nav-log" class="nav-btn">LOGS</button>
       <button class="help-btn" title="Help">?</button>
     </nav>
 
@@ -358,6 +358,7 @@
       </header>
       <div class="sub-action-bar">
         <button id="btn-log-download" class="sub-btn">DOWNLOAD CSV</button>
+        <button id="btn-log-clear" class="sub-btn sub-btn-red">CLEAR LOG</button>
       </div>
       <div class="screen-content">
         <div class="log-graph-toggle">
@@ -412,6 +413,17 @@
         <div class="modal-actions">
           <button type="button" class="btn-cancel">Cancel</button>
           <button type="button" id="btn-confirm-delete" class="btn-delete">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm clear log modal -->
+    <div id="modal-clear-log" class="modal hidden">
+      <div class="modal-content modal-confirm">
+        <p>Clear the entire pour log? This cannot be undone.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="btn-clear-log-cancel">Cancel</button>
+          <button type="button" class="btn-delete" id="btn-clear-log-confirm">Clear</button>
         </div>
       </div>
     </div>
