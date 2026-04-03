@@ -518,14 +518,6 @@ function navigateToSettings() {
   setActiveSettingsTab('system');
 }
 
-function navigateToLog() {
-  cleanupSettings();
-  showScreen('log-screen');
-  setActiveNav('btn-nav-log');
-  resumePolling();
-  loadLogData();
-}
-
 // ---------------------------------------------------------------------------
 // Pour Log
 // ---------------------------------------------------------------------------
@@ -627,7 +619,7 @@ function renderGraphByDay(container) {
     const key = d.toISOString().slice(0, 10);
     buckets[key] = (buckets[key] || 0) + (parseFloat(e.volume_liters) || 0);
   });
-  const days = Object.keys(buckets).sort().slice(-14);
+  const days = Object.keys(buckets).sort().slice(-30).reverse();
   if (days.length === 0) {
     container.innerHTML = '<div class="log-graph-empty">No data to graph.</div>';
     return;
@@ -723,6 +715,7 @@ const SUB_ACTION_MAP = {
   updates: ['settings-check', 'settings-install', 'settings-restart'],
   about: [],
   calibration: ['settings-cal-save', 'settings-cal-reset', 'settings-cal-default'],
+  logs: ['settings-log-download', 'settings-log-clear'],
 };
 
 function setActiveSettingsTab(tabId) {
@@ -745,6 +738,7 @@ function setActiveSettingsTab(tabId) {
 function initSettingsTab(tabId) {
   if (tabId === 'system') loadSystemConfig();
   else if (tabId === 'calibration') initCalibrationTab();
+  else if (tabId === 'logs') loadLogData();
 }
 
 async function loadSystemConfig() {
@@ -2441,7 +2435,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-nav-kegs').addEventListener('click', navigateToKegs);
   document.getElementById('btn-nav-beverages').addEventListener('click', navigateToBeverages);
   document.getElementById('btn-nav-settings').addEventListener('click', navigateToSettings);
-  document.getElementById('btn-nav-log').addEventListener('click', navigateToLog);
 
   document.querySelectorAll('.log-table th.sortable').forEach(th => {
     th.addEventListener('click', () => logSortBy(th.dataset.sort));
@@ -2454,8 +2447,8 @@ document.addEventListener('DOMContentLoaded', () => {
       renderLogGraph();
     });
   });
-  document.getElementById('btn-log-download')?.addEventListener('click', downloadLogCsv);
-  document.getElementById('btn-log-clear')?.addEventListener('click', showClearLogModal);
+  document.getElementById('settings-log-download')?.addEventListener('click', downloadLogCsv);
+  document.getElementById('settings-log-clear')?.addEventListener('click', showClearLogModal);
   document.getElementById('btn-clear-log-cancel')?.addEventListener('click', closeClearLogModal);
   document.getElementById('btn-clear-log-confirm')?.addEventListener('click', confirmClearLog);
 
@@ -2479,9 +2472,9 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (t === 'updates') anchor = 'updates';
         else if (t === 'about') anchor = 'about';
         else if (t === 'calibration') anchor = 'calibration';
+        else if (t === 'logs') anchor = 'toc';
         else anchor = 'system';
       }
-      else if (id === 'btn-nav-log') anchor = 'toc';
     }
     window.open('help.html#' + anchor, '_blank');
   });

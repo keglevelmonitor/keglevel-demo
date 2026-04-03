@@ -27,7 +27,6 @@
       <button id="btn-nav-kegs" class="nav-btn">KEGS</button>
       <button id="btn-nav-beverages" class="nav-btn">BEVERAGES</button>
       <button id="btn-nav-settings" class="nav-btn">SETTINGS</button>
-      <button id="btn-nav-log" class="nav-btn">LOGS</button>
       <button class="help-btn" title="Help">?</button>
     </nav>
 
@@ -206,6 +205,7 @@
         <button class="settings-tab-btn" data-settings-tab="updates">UPDATES</button>
         <button class="settings-tab-btn" data-settings-tab="about">ABOUT</button>
         <button class="settings-tab-btn" data-settings-tab="calibration">CALIBRATION</button>
+        <button class="settings-tab-btn" data-settings-tab="logs">LOGS</button>
       </div>
       <div id="settings-sub-actions" class="sub-action-bar hidden">
         <button id="settings-alerts-test" class="sub-btn hidden" disabled>TEST SEND</button>
@@ -216,6 +216,8 @@
         <button id="settings-cal-save" class="sub-btn hidden" disabled>SAVE CALIBRATION</button>
         <button id="settings-cal-reset" class="sub-btn hidden">RESET PULSES</button>
         <button id="settings-cal-default" class="sub-btn hidden" disabled>SET TO DEFAULT</button>
+        <button id="settings-log-download" class="sub-btn hidden">DOWNLOAD CSV</button>
+        <button id="settings-log-clear" class="sub-btn sub-btn-red hidden">CLEAR LOG</button>
       </div>
       <div class="settings-content">
         <!-- SYSTEM tab -->
@@ -348,38 +350,28 @@
             </label>
           </div>
         </div>
-      </div>
-    </main>
-
-    <!-- Log screen -->
-    <main id="log-screen" class="screen hidden">
-      <header class="screen-header">
-        <h2>Pour Log</h2>
-      </header>
-      <div class="sub-action-bar">
-        <button id="btn-log-download" class="sub-btn">DOWNLOAD CSV</button>
-        <button id="btn-log-clear" class="sub-btn sub-btn-red">CLEAR LOG</button>
-      </div>
-      <div class="screen-content">
-        <div class="log-graph-toggle">
-          <button class="log-toggle-btn active" data-view="day">By Day</button>
-          <button class="log-toggle-btn" data-view="tap">By Tap</button>
-        </div>
-        <div id="log-graph" class="log-graph"></div>
-        <div class="log-table-wrap">
-          <table class="log-table" id="log-table">
-            <thead>
-              <tr>
-                <th data-sort="timestamp" class="sortable sort-active sort-desc">Date/Time</th>
-                <th data-sort="tap_index" class="sortable">Tap</th>
-                <th data-sort="keg_name" class="sortable">Keg</th>
-                <th data-sort="beverage_name" class="sortable">Beverage</th>
-                <th data-sort="volume_liters" class="sortable">Volume</th>
-                <th data-sort="duration_s" class="sortable">Duration</th>
-              </tr>
-            </thead>
-            <tbody id="log-tbody"></tbody>
-          </table>
+        <!-- LOGS tab -->
+        <div id="settings-logs" class="settings-pane">
+          <div class="log-graph-toggle">
+            <button class="log-toggle-btn active" data-view="day">By Day</button>
+            <button class="log-toggle-btn" data-view="tap">By Tap</button>
+          </div>
+          <div id="log-graph" class="log-graph"></div>
+          <div class="log-table-wrap">
+            <table class="log-table" id="log-table">
+              <thead>
+                <tr>
+                  <th data-sort="timestamp" class="sortable sort-active sort-desc">Date/Time</th>
+                  <th data-sort="tap_index" class="sortable">Tap</th>
+                  <th data-sort="keg_name" class="sortable">Keg</th>
+                  <th data-sort="beverage_name" class="sortable">Beverage</th>
+                  <th data-sort="volume_liters" class="sortable">Volume</th>
+                  <th data-sort="duration_s" class="sortable">Duration</th>
+                </tr>
+              </thead>
+              <tbody id="log-tbody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </main>

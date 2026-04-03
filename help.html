@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KegLevel Pico — Help</title>
-  <link rel="icon" href="assets/beer-keg.ico" type="image/x-icon">
-  <link rel="icon" href="assets/beer-keg.png" type="image/png" sizes="32x32">
-  <link rel="apple-touch-icon" href="assets/beer-keg.png">
-  <style>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KegLevel Brain — Help</title>
+    <link rel="icon" href="assets/beer-keg.ico" type="image/x-icon">
+    <link rel="icon" href="assets/beer-keg.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="assets/beer-keg.png">
+    <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -162,342 +162,797 @@
     }
     .back-to-top:hover { text-decoration: underline; }
   </style>
-</head>
-<body>
-
-  <header class="help-header">
-    <a href="index.html" class="back-link">&larr; Back to App</a>
-    <h1>KegLevel Pico &mdash; Help</h1>
-  </header>
-
-  <div class="help-wrap">
-
-    <!-- Table of Contents -->
-    <nav class="toc" id="toc">
-      <h2>Contents</h2>
-      <ol>
-        <li><a href="#installation">Installation</a></li>
-        <li><a href="#provisioning">Provisioning (Connecting to WiFi)</a></li>
-        <li><a href="#first-time-setup">First Time Setup</a></li>
-        <li><a href="#taps">Taps Screen</a></li>
-        <li><a href="#kegs">Kegs Screen</a></li>
-        <li><a href="#beverages">Beverages Screen</a></li>
-        <li>
-          <a href="#system">Settings</a>
-          <ul class="toc-sub">
-            <li><a href="#system">System</a></li>
-            <li><a href="#notifications">Notifications</a></li>
-            <li><a href="#updates">Updates</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#calibration">Calibration</a></li>
-          </ul>
-        </li>
-        <li><a href="#batchflow">BatchFlow</a></li>
-        <li><a href="#troubleshooting">Troubleshooting</a></li>
-      </ol>
-    </nav>
-
-    <!-- Installation -->
-    <section class="help-section" id="installation">
-      <h2>Installation</h2>
-      <h3>Sensor Placement</h3>
-      <p>Install one flow sensor in each beer line you want to monitor. Place each sensor as close to the <strong>OUT post</strong> (liquid post) of the keg as possible. This ensures the most accurate measurement of dispensed volume.</p>
-      <p>The sensor connects inline with the beverage tubing. Depending on your kegerator, you may need short pieces of beverage tubing and clamps to splice the sensor into the line.</p>
-
-      <h3>Device Placement</h3>
-      <p>The KegLevel Pico unit can be placed inside or outside your kegerator. If placed inside, keep it away from direct contact with kegs and moisture. If placed outside, route the wiring harness through the kegerator opening (e.g. the drip tray hole or the collar gap).</p>
-
-      <h3>Wiring Harness</h3>
-      <p>Connect each flow sensor to the wiring harness. Each sensor cable has three wires:</p>
-      <ul>
-        <li><strong>Red</strong> &mdash; 5V power</li>
-        <li><strong>Black</strong> &mdash; Ground</li>
-        <li><strong>Yellow</strong> &mdash; Signal (pulse output)</li>
-      </ul>
-      <p>The wiring harness is pre-assembled and labeled. Match each sensor connector to the corresponding tap port on the harness.</p>
-
-      <h3>Temperature Sensor</h3>
-      <p>A DS18B20 temperature sensor is included and pre-wired. Place the sensor probe inside the kegerator where it can read the ambient air temperature. Avoid placing it directly on a keg or near the cooling element.</p>
-
-      <h3>Validating the Installation</h3>
-      <p>After connecting everything, power on the Pico and open the web interface. Go to <strong>Settings &gt; Calibration</strong> and pour a small amount from each tap. Verify that pulses are being counted. If a tap shows zero pulses during flow, check the sensor wiring and connection.</p>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- Provisioning -->
-    <section class="help-section" id="provisioning">
-      <h2>Provisioning (Connecting to WiFi)</h2>
-      <p>When the KegLevel Pico is first powered on (or after a factory reset), it starts in <strong>Standalone mode</strong>. In this mode, the Pico creates its own WiFi network called <code>KegLevel-Pico</code>.</p>
-
-      <h3>Connecting to Your WiFi Network</h3>
-      <ol>
-        <li>Connect your phone or computer to the <code>KegLevel-Pico</code> WiFi network.</li>
-        <li>Open a browser and go to <code>http://192.168.4.1</code>.</li>
-        <li>Navigate to <strong>Settings &gt; System</strong>.</li>
-        <li>Click <strong>Enable WiFi Mode</strong>.</li>
-        <li>Enter your WiFi network name (SSID) and password when prompted.</li>
-        <li>The Pico will reboot and connect to your WiFi network.</li>
-      </ol>
-      <p>Once connected to your WiFi, the Pico will be accessible from any device on the same network. The Pico's IP address will be shown in your router's connected devices list.</p>
-
-      <h3>Standalone vs WiFi Mode</h3>
-      <table>
-        <tr><th>Feature</th><th>WiFi Mode</th><th>Standalone Mode</th></tr>
-        <tr><td>Web interface</td><td>Available on your network</td><td>Available at 192.168.4.1</td></tr>
-        <tr><td>Email notifications</td><td>Available</td><td>Not available</td></tr>
-        <tr><td>Firmware updates (OTA)</td><td>Available</td><td>Not available</td></tr>
-        <tr><td>Internet required</td><td>Yes (for your WiFi network)</td><td>No</td></tr>
-      </table>
-      <p>You can switch between modes at any time from <strong>Settings &gt; System</strong>.</p>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- First Time Setup -->
-    <section class="help-section" id="first-time-setup">
-      <h2>First Time Setup</h2>
-      <p>After installation and provisioning, follow these steps to get started:</p>
-      <ol>
-        <li><strong>Set active taps</strong> &mdash; Go to <strong>Settings &gt; System</strong> and set the number of taps you have connected. Only active taps will appear on the Taps screen.</li>
-        <li><strong>Choose units</strong> &mdash; Select Metric (liters) or Imperial (gallons) under <strong>Settings &gt; System</strong>.</li>
-        <li><strong>Add your beverages</strong> &mdash; Go to the <strong>Beverages</strong> screen and add each beer, cider, or other beverage you have on tap. Enter the name, ABV, IBU, and SRM (color) for each.</li>
-        <li><strong>Add your kegs</strong> &mdash; Go to the <strong>Kegs</strong> screen and add a keg for each physical keg. Set the beverage, capacity, and tare weight for each.</li>
-        <li><strong>Assign kegs to taps</strong> &mdash; Edit each keg and assign it to the correct tap, or use the tap card buttons on the <strong>Taps</strong> screen.</li>
-        <li><strong>Calibrate (optional)</strong> &mdash; If you want precise volume tracking, perform a calibration for each tap. See the <a href="#calibration">Calibration</a> section for instructions.</li>
-      </ol>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- Taps Screen -->
-    <section class="help-section" id="taps">
-      <h2>Taps Screen</h2>
-      <p>The Taps screen is the main dashboard. It shows a card for each active tap with real-time information.</p>
-
-      <h3>Tap Cards</h3>
-      <p>Each tap card displays:</p>
-      <ul>
-        <li><strong>Tap number</strong> &mdash; Tap 1 through Tap 5</li>
-        <li><strong>Beverage name</strong> &mdash; The beverage currently assigned to this tap</li>
-        <li><strong>Keg level</strong> &mdash; A visual level indicator showing how much beer remains</li>
-        <li><strong>Volume remaining</strong> &mdash; The remaining volume in liters or gallons</li>
-        <li><strong>ABV, IBU, SRM</strong> &mdash; Beverage stats displayed on the card</li>
-        <li><strong>Pour indicator</strong> &mdash; Animates when the system detects an active pour</li>
-      </ul>
-
-      <h3>Tap Card Actions</h3>
-      <p>Click the <strong>keg icon</strong> on a tap card to open the keg selection menu. From there you can:</p>
-      <ul>
-        <li>Assign a different keg to the tap</li>
-        <li>Mark the current keg as empty (zeros the volume and unassigns it)</li>
-        <li>View calibration data for the keg being kicked</li>
-      </ul>
-
-      <h3>Temperature</h3>
-      <p>The current kegerator temperature is shown in the header bar at the top left. It updates automatically.</p>
-
-      <h3>Simulated Pours</h3>
-      <p>If the Pico is in simulation mode (no physical sensors), a <strong>Pour</strong> button appears on each tap card. Clicking it simulates dispensing a small amount of beer so you can test the system without hardware.</p>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- Kegs Screen -->
-    <section class="help-section" id="kegs">
-      <h2>Kegs Screen</h2>
-      <p>The Kegs screen is your keg inventory. Each row shows a keg with its name, contents (beverage), tap assignment, and action buttons.</p>
-
-      <h3>Adding a Keg</h3>
-      <p>Click <strong>+ ADD NEW</strong> to create a new keg. Keg names are auto-generated (Keg 01, Keg 02, etc.).</p>
-
-      <h3>Editing a Keg</h3>
-      <p>Click the <strong>edit</strong> button on a keg row to open the edit modal. You can change:</p>
-      <ul>
-        <li><strong>Beverage</strong> &mdash; Select which beverage is in this keg</li>
-        <li><strong>Empty (Tare) weight</strong> &mdash; The weight of the empty keg in kilograms</li>
-        <li><strong>Max Capacity</strong> &mdash; The maximum volume the keg holds in liters</li>
-        <li><strong>Total Weight</strong> &mdash; The total weight of the keg when full (used to calculate volume at fill)</li>
-        <li><strong>Tap assignment</strong> &mdash; Assign this keg to a tap, or set it to Unassigned</li>
-      </ul>
-      <p>The <strong>Volume at Fill</strong> field is automatically calculated from the total weight, tare weight, and a standard specific gravity of 1.014.</p>
-
-      <h3>Deleting a Keg</h3>
-      <p>Click the <strong>delete</strong> button on a keg row. You will be asked to confirm. A keg that is currently assigned to a tap must be unassigned first.</p>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- Beverages Screen -->
-    <section class="help-section" id="beverages">
-      <h2>Beverages Screen</h2>
-      <p>The Beverages screen is your beverage library. Every unique beer, cider, mead, or other drink you serve should be added here.</p>
-
-      <h3>Adding a Beverage</h3>
-      <p>Click <strong>+ ADD NEW</strong> to create a new beverage. Enter:</p>
-      <ul>
-        <li><strong>Name</strong> &mdash; The beverage name (e.g. "American IPA")</li>
-        <li><strong>ABV</strong> &mdash; Alcohol by volume (e.g. 6.5)</li>
-        <li><strong>IBU</strong> &mdash; International Bitterness Units (e.g. 55)</li>
-        <li><strong>SRM</strong> &mdash; Standard Reference Method color value (e.g. 8). A color swatch preview is shown as you adjust this value.</li>
-      </ul>
-
-      <h3>Editing a Beverage</h3>
-      <p>Click the <strong>edit</strong> button on a beverage row. Changes are saved immediately and reflected everywhere the beverage is used (tap cards, keg assignments, BatchFlow cards).</p>
-
-      <h3>Deleting a Beverage</h3>
-      <p>Click the <strong>delete</strong> button. If the beverage is currently assigned to a keg, you will be notified and must remove it from the keg first.</p>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- Settings: System -->
-    <section class="help-section" id="system">
-      <h2>Settings: System</h2>
-
-      <h3>Active Taps</h3>
-      <p>Set the number of taps you have physically connected. The Pico supports up to 5 taps. Only active taps are shown on the Taps screen and processed for flow detection.</p>
-
-      <h3>Units</h3>
-      <p>Choose between <strong>Metric</strong> (liters, Celsius) and <strong>Imperial</strong> (gallons, Fahrenheit). This affects all volume and temperature displays throughout the app.</p>
-
-      <h3>WiFi / Standalone Mode</h3>
-      <p>Two buttons let you switch between WiFi Mode and Standalone Mode. See <a href="#provisioning">Provisioning</a> for details on the differences between modes. Switching modes causes the Pico to reboot immediately.</p>
-
-      <div class="note">The mode buttons are disabled until the Pico confirms which mode it is currently in. The button for the current mode is always disabled.</div>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- Settings: Notifications -->
-    <section class="help-section" id="notifications">
-      <h2>Settings: Notifications</h2>
-      <p>The KegLevel Pico can send email notifications using the <a href="https://www.mailgun.com" target="_blank">Mailgun</a> email service. A free Mailgun account is sufficient for typical usage.</p>
-
-      <div class="note">Notifications require WiFi Mode with Internet access. They are not available in Standalone Mode.</div>
-
-      <h3>Setting Up Mailgun</h3>
-      <ol>
-        <li>Create a free account at <a href="https://www.mailgun.com" target="_blank">mailgun.com</a>.</li>
-        <li>From your Mailgun dashboard, find your <strong>API Key</strong> and <strong>Domain</strong>.</li>
-        <li>Enter these values on the Notifications settings screen along with your From and Recipient email addresses.</li>
-        <li>Click <strong>TEST SEND</strong> to verify the configuration. You should receive a test email.</li>
-        <li>Click <strong>SAVE</strong> to store the configuration on the Pico.</li>
-      </ol>
-
-      <h3>Regular Reports</h3>
-      <p>Set the <strong>Report Frequency</strong> to receive periodic email reports summarizing your keg levels and temperature. Options are None, Hourly, Daily, or Weekly.</p>
-
-      <h3>Conditional Reports</h3>
-      <p>Conditional reports are sent immediately when a threshold is crossed:</p>
-      <ul>
-        <li><strong>Low Volume</strong> &mdash; Triggered when any keg drops below the set volume. Slide to OFF to disable.</li>
-        <li><strong>Low Temp</strong> &mdash; Triggered when the kegerator temperature drops below the set threshold. Useful for detecting cooling malfunctions.</li>
-        <li><strong>High Temp</strong> &mdash; Triggered when the kegerator temperature rises above the set threshold. Useful for detecting door-left-open or cooling failure.</li>
-      </ul>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- Settings: Updates -->
-    <section class="help-section" id="updates">
-      <h2>Settings: Updates</h2>
-      <p>The KegLevel Pico supports over-the-air (OTA) firmware updates. When a new version is available, you can install it directly from this screen without disconnecting anything.</p>
-
-      <div class="note">OTA updates require WiFi Mode with Internet access. They are not available in Standalone Mode.</div>
-
-      <h3>Checking for Updates</h3>
-      <p>Click <strong>CHECK</strong> to query the update server. The current firmware version is shown at the top of the screen. If a newer version is available, the <strong>INSTALL</strong> button will become active.</p>
-
-      <h3>Installing an Update</h3>
-      <p>Click <strong>INSTALL</strong> to begin the update. A progress bar will show the download and installation progress. The update log below shows detailed status messages. After installation completes, click <strong>RELOAD</strong> to reboot the Pico with the new firmware.</p>
-
-      <div class="note">Do not power off the Pico during a firmware update. The web UI is included with the firmware and updates automatically.</div>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- Settings: About -->
-    <section class="help-section" id="about">
-      <h2>Settings: About</h2>
-      <p>The About screen displays copyright information, brand acknowledgements, and a link to support the project with a donation.</p>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- Settings: Calibration -->
-    <section class="help-section" id="calibration">
-      <h2>Settings: Calibration</h2>
-      <p>Calibration adjusts the K-factor for each flow sensor. The K-factor determines how many sensor pulses equal one liter of liquid. Every sensor is slightly different, so calibrating improves accuracy.</p>
-
-      <h3>How to Calibrate</h3>
-      <ol>
-        <li>Go to <strong>Settings &gt; Calibration</strong>.</li>
-        <li>Select the tap you want to calibrate. The tap button will highlight and the Pico begins counting pulses.</li>
-        <li>Pour a <strong>known volume</strong> of liquid through that tap into a measuring container. Pour only from the selected tap.</li>
-        <li>Use the <strong>Measured Volume</strong> slider (or +/&minus; buttons) to enter the exact volume you poured.</li>
-        <li>The <strong>New K-Factor</strong> is calculated automatically from the measured volume and pulse count.</li>
-        <li>Click <strong>SAVE CALIBRATION</strong> to apply the new K-factor.</li>
-      </ol>
-
-      <h3>Other Calibration Actions</h3>
-      <ul>
-        <li><strong>RESET PULSES</strong> &mdash; Clears the pulse counter to zero so you can start a fresh calibration pour.</li>
-        <li><strong>SET TO DEFAULT</strong> &mdash; Resets the K-factor to the factory default (5100 pulses per liter).</li>
-      </ul>
-
-      <h3>Tips for Best Results</h3>
-      <ul>
-        <li>Use a graduated measuring container for accurate volume measurement.</li>
-        <li>Pour at least 500 mL for a reliable calibration &mdash; larger volumes produce more accurate results.</li>
-        <li>Pour at a normal pace, similar to how you would pour a glass of beer.</li>
-        <li>If the <strong>Deduct volume from Inventory</strong> checkbox is checked, the poured volume will be subtracted from the keg's current level.</li>
-      </ul>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- BatchFlow -->
-    <section class="help-section" id="batchflow">
-      <h2>BatchFlow</h2>
-      <p>BatchFlow is a built-in brewing workflow board that helps you track batches from recipe to finished keg. It opens in a separate window from the <strong>BatchFlow</strong> button in the app header.</p>
-      <p>BatchFlow has its own help system. Click the <strong>?</strong> button inside the BatchFlow app for detailed instructions on using the workflow board, adding batches, moving cards between columns, and editing beverages.</p>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-    <!-- Troubleshooting -->
-    <section class="help-section" id="troubleshooting">
-      <h2>Troubleshooting</h2>
-
-      <h3>LED Indicators</h3>
-      <table>
-        <tr><th>LED Behavior</th><th>Meaning</th></tr>
-        <tr><td>Blinking slowly</td><td>Pico is starting up or searching for WiFi</td></tr>
-        <tr><td>Solid on</td><td>Pico is connected and running normally</td></tr>
-        <tr><td>Cycles blink &rarr; solid &rarr; blink</td><td>Server is crashing on startup and rebooting in a loop</td></tr>
-        <tr><td>LED off</td><td>Pico has lost power or hard crashed &mdash; unplug and replug</td></tr>
-      </table>
-
-      <h3>Common Issues</h3>
-      <table>
-        <tr><th>Problem</th><th>Possible Cause &amp; Fix</th></tr>
-        <tr><td>Web page won't load but Pico responds to ping</td><td>The web server may have crashed due to a missing file. Check the Pico's error log if accessible, or reflash the firmware.</td></tr>
-        <tr><td>Web page loads from phone but not from PC</td><td>Windows Firewall or a proxy may be intercepting traffic on port 80. Try disabling the firewall temporarily to test.</td></tr>
-        <tr><td>No pulses counted during pour</td><td>Check the sensor wiring. Ensure the sensor connector is fully seated in the wiring harness. Try a different tap to isolate whether the issue is the sensor or the wiring.</td></tr>
-        <tr><td>Temperature shows &ldquo;&mdash;&rdquo; or no reading</td><td>The DS18B20 temperature sensor may be disconnected. Check the sensor connector on the wiring harness.</td></tr>
-        <tr><td>Can't connect to KegLevel-Pico WiFi</td><td>The Pico may not be in Standalone mode, or it may still be booting. Wait 30 seconds after powering on and try again.</td></tr>
-        <tr><td>Notifications not sending</td><td>Verify that the Pico is in WiFi mode with Internet access. Double-check the Mailgun API key, domain, and email addresses on the Notifications settings screen. Use TEST SEND to diagnose.</td></tr>
-        <tr><td>OTA update fails</td><td>Ensure the Pico has a stable Internet connection. Do not power off during the update. If the update fails, the previous firmware should still be running &mdash; try again.</td></tr>
-      </table>
-
-      <h3>Factory Reset</h3>
-      <p>If the Pico is unresponsive and you cannot access the web interface, you can reflash the firmware using a USB connection and the <code>mpremote</code> tool. This will restore the Pico to its original state. Your keg and beverage data will be preserved in the configuration files unless you explicitly delete them.</p>
-
-      <a href="#toc" class="back-to-top">&uarr; Back to top</a>
-    </section>
-
-  </div>
-
-</body>
+  </head>
+  <body>
+    <header class="help-header">
+      <a href="index.html" class="back-link">← Back to App</a>
+      <h1>KegLevel Brain — Help</h1>
+    </header>
+    <div class="help-wrap">
+      <!-- Table of Contents -->
+      <nav class="toc" id="toc">
+        <h2>Contents</h2>
+        <ol>
+          <li><a href="#first-time-installation">First Time Installation</a></li>
+          <li><a href="#provisioning">Provisioning (Connecting to WiFi)</a></li>
+          <li><a href="#first-time-setup">Setting Up the Web App for the First Time</a></li>
+          <li><a href="#installation">Installing in your Kegerator or Keezer</a></li>
+          <li><a href="#taps">TAPS Screen</a></li>
+          <li><a href="#kegs">KEGS Screen</a></li>
+          <li><a href="#beverages">BEVERAGES Screen</a></li>
+          <li><a href="#system">Settings</a>
+            <ul class="toc-sub">
+              <li><a href="#system">System</a></li>
+              <li><a href="#notifications">Notifications</a></li>
+              <li><a href="#updates">Updates</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#calibration">Calibration</a></li>
+              <li><a href="#logs">Logs</a></li>
+            </ul>
+          </li>
+          <li><a href="#batchflow">BatchFlow</a></li>
+          <li><a href="#troubleshooting">Troubleshooting</a></li>
+          <li><a href="#wifi-reset">WiFi Reset</a></li>
+        </ol>
+      </nav>
+
+      <!-- First Time Installation -->
+      <section class="help-section" id="first-time-installation">
+        <h2>First Time Installation</h2>
+        <p>Here's the path to success for the first time installation: </p>
+        <ol>
+          <li>Watch the setup video <a href="https://www.youtube.com/watch?v=PLACEHOLDER">{setup_video}</a>.
+            That may be enough to complete the installation!&nbsp; </li>
+          <li>Set up and connect everything on a table or desktop and provision
+            the Brain:<br>
+            <ul>
+              <li>Get your phone. You'll need it to connect the Brain to WiFi.</li>
+              <li>Place the Brain and all of the sensors on a table. Make sure
+                there is an outlet nearby. </li>
+              <li>Connect the temperature probe and all of the sensors to their
+                respective connectors on the harness.</li>
+              <li>Plug in the Brain and follow the instructions below for
+                Provisioning. </li>
+            </ul>
+          </li>
+          <li>Follow the instructions below for Setting Up the Web App for the
+            First Time. </li>
+          <li>Follow the instructions below for Installing in your Kegerator or
+            Keezer. You may want to "try-out" the installation location, inside
+            or outside the kegerator or keezer, before committing to the full
+            installation. You want to make sure the web app stays connected when
+            the Brain is in its final installation location. </li>
+        </ol>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Provisioning -->
+      <section class="help-section" id="provisioning">
+        <h2>Provisioning (Connecting to WiFi)</h2>
+        <p>The very first time the KegLevel Brain is powered on, it creates its
+          own WiFi network called <code>KegLevel-Brain</code>. When you connect
+          to that network with your computer or phone, a setup page is
+          automatically loaded (Captive Portal). This allows you to select the
+          mode you will use: Network or Standalone. The <b>Network&nbsp; mode </b>provides
+          the most robust features and requires the Brain to be connected to
+          your WiFi network. The <b>Standalone mode </b>provides all but a few
+          features and operates fully isolated from your WiFi network. After
+          provisioning, you can switch between modes at any time from <strong>Settings
+            &gt; System</strong>. But to connect to the Brain the very first
+          time, you must decide which mode you'll use:</p>
+        <h3>Network Mode vs. Standalone Mode</h3>
+        <table>
+          <tbody>
+            <tr>
+              <th>Feature</th>
+              <th>Network Mode</th>
+              <th>Standalone Mode</th>
+            </tr>
+            <tr>
+              <td>Web interface</td>
+              <td>Available to any number of browsers on your WiFi network
+                simultaneously</td>
+              <td>Available to one browser at-a-time at 192.168.4.1</td>
+            </tr>
+            <tr>
+              <td>Email notifications</td>
+              <td>Available</td>
+              <td>Not available</td>
+            </tr>
+            <tr>
+              <td>Firmware updates OTA (Over-the-Air)</td>
+              <td>Available</td>
+              <td>Not available</td>
+            </tr>
+            <tr>
+              <td>Internet required</td>
+              <td>Yes (your WiFi network must have Internet)</td>
+              <td>No</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>First Time Provisioning</h3>
+        <ol>
+          <li>Power on the KegLevel Brain.</li>
+          <li>Navigate to the WiFi settings on your phone or computer.
+            Momentarily you should see <code>KegLevel-Brain</code> in the list
+            of WiFi networks. Select it.&nbsp;</li>
+          <li>A "captive portal" browser window should open; it may take 5-15
+            seconds so be patient. <br>
+            <br>
+            <p> <b> </b><strong>IMPORTANT! If you have trouble connecting to
+                the "captive portal", your phone or computer might be trying to
+                be helpful. Sometimes they will bypass a network selection that
+                does not have Internet access (the <code>KegLevel-Brain</code>
+                network) and will try to auto-connect to a network that does
+                (your WiFi network). If this happens, try this: </strong></p>
+            <ul>
+              <li>Turn off auto-connect / auto-join or select "forget" for your
+                network until provisioning is complete.</li>
+              <li>Select Airplane Mode until provisioning is complete.&nbsp;</li>
+              <li>If you are still unable to connect to the captive portal,
+                contact keglevelmonitor@gmail.com for help. </li>
+            </ul>
+          </li>
+          <li>
+            <p>Select the desired mode: Network or Standalone. </p>
+          </li>
+        </ol>
+        <p><b>If you selected Network: </b></p>
+        <ol>
+          <li>Select the desired network in the drop down list. </li>
+          <li>Enter the network password and click Connect. </li>
+          <li>You will see a Connecting to {network}... message. Be patient.
+            This may take 30-60 seconds. </li>
+          <li>When the connection is complete, a Connected! message appears with
+            an IP address. That is the IP address your network has assigned to
+            the Brain. Take a screen snapshot or write down the IP address. </li>
+          <li>Reconnect your computer or phone to your network. </li>
+          <li>Launch a browser window, type the Brain's IP address into the
+            browser's address bar, and press Enter. The main TAPS screen should
+            be shown with 5 taps "Offline". Follow the instructions to set up
+            the web app for the first time. <br>
+            <div class="note">If your WiFi credentials change (network ID or
+              password) you'll need to use the WiFi Reset button to provision
+              the KegLevel Brain again. Refer to <a href="#wifi-reset">WiFi Reset</a>. <br>
+              <br>
+              If your WiFi network router reassigns an IP address to the Brain
+              (rare) you'll need to do one of these: <br>
+              &nbsp;&nbsp;&nbsp; - find the newly-assigned IP address using your
+              router's configuration pages<br>
+              &nbsp;&nbsp;&nbsp; - reset the WiFi and provision again; refer to
+              <a href="#wifi-reset">WiFi Reset</a><br>
+              If desired, you can use your network router's configuration pages
+              to assign a static IP address to the Brain. This will ensure the
+              IP address is not reassigned on the network.</div>
+          </li>
+        </ol>
+        <p>
+          <b>If you selected Standalone: </b></p>
+        <ol>
+          <li>You will see the message Standalone Mode Enabled. The Brain has
+            created its own WiFi network called KegLevel-Brain and is
+            broadcasting its website at 192.168.4.1. </li>
+          <li>Close the captive portal window on your device. Return to your
+            device's WiFi Settings screen. <br>
+            <div class="note">If you receive a popup asking, Use Without
+              Internet? answer Yes. The Brain created its own WiFi network and
+              does not have access to your Internet-connected WiFi network.
+              Therefore it is not connected to the Internet..</div>
+          </li>
+          <li>Select the KegLevel-Brain network from the list of WiFi networks
+            on your device, if not already selected.</li>
+          <li>Launch a browser window, type 192.168.4.1 into the browser's
+            address bar, and press Enter. The main TAPS screen should be shown
+            with 5 taps "Offline". Follow the instructions to set up the web app
+            for the first time. </li>
+        </ol>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- First Time Setup -->
+      <section class="help-section" id="first-time-setup">
+        <h2>Setting Up the Web App for the First Time</h2>
+        <p>After provisioning, follow these steps to set up the web app:</p>
+        <ol>
+          <li><strong>Select the basic settings&nbsp; </strong>—
+            <ul>
+              <li>Click <strong>SETTINGS.</strong></li>
+              <li>Set the number of taps you have connected. Only active taps
+                will appear on the Taps screen.</li>
+              <li>Select the desired measurement units, Metric (liters/Celcius)
+                or Imperial (gallons/Fahrenheit). </li>
+              <li>Enable or disable Leak Detection. When On, if the brain senses
+                a very slow flow rate that is less than a pour, it will
+                highlight the tap with "Leak?" and if notifications are
+                configured, will email a notification.</li>
+            </ul>
+          </li>
+          <li><strong>Add your beverages</strong> — Click <strong>BEVERAGES </strong>and
+            add each beer, cider, or other beverage you have on tap. Enter the
+            name, ABV, IBU, and SRM (color) for each. You can edit or delete the
+            default beverages. <br>
+            <strong></strong></li>
+          <li><strong>Add your kegs </strong>— Click <strong>KEGS </strong>and
+            add a keg for each physical keg used in your kegerator. Set the
+            empty weight (tare) and maximum capacity for each keg. If the keg
+            has a beverage in it, select a beverage. You can edit or delete the
+            default kegs.<br>
+            <div class="note">It is helpful to label your kegs with the keg name
+              and tare weight. A paint pen works great. <br>
+            </div>
+            <br>
+            <div class="note">The first time you install the KegLevel Brain you
+              will probably have kegs already in the kegerator. For now just
+              estimate the tare weight and current weight/volume of the kegs.
+              Until those kegs are replaced with kegs for which you have a
+              measured tare weight and a measured filled weight, the volume
+              shown for the kegs may not be accurate. </div>
+          </li>
+          <li><strong>Assign kegs to taps</strong> — Click <strong>TAPS</strong>.
+            To assign a keg, click on a tap and select the keg from the
+            list.&nbsp;</li>
+          <li><strong>Calibrate the sensors (optional)</strong> — The sensors
+            are pre-calibrated and the calibration K-factors are entered into
+            the Brain before the system is shipped to you. Just be sure to match
+            the sensor to the tap number and sensor calibration should not be
+            necessary.&nbsp;&nbsp; </li>
+        </ol>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Installing in your Kegerator or Keezer -->
+      <section class="help-section" id="installation">
+        <h2>Installing in your Kegerator or Keezer</h2>
+        <h3>Sensor Placement</h3>
+        <p>Sensors purchased directly from KegLevel Monitor are pre-tested and
+          pre-calibrated. Install one flow sensor inline with each beverage line
+          you want to monitor. Place each sensor as close to the <strong>OUT
+            post</strong> (liquid post) of the keg as possible. This reduces
+          agitation and ensures the most accurate measurement of dispensed
+          volume. Depending on your
+          kegerator, you may need a short piece of beverage tubing and a clamp
+          to splice the sensor into the beverage line. Note that each sensor's
+          calibration "K-factor" has been entered into the KegLevel Brain and is
+          written on the sensor for reference.</p>
+        <h3>KegLevel Brain Placement</h3>
+        <p>When determining the placement of the KegLevel Brain you must ensure:</p>
+        <ul>
+          <li> the wiring harness will reach the farthest keg without stressing
+            the cabling;</li>
+          <li>the Brain is placed such that spillage will not immerse it;</li>
+          <li>there is good WiFi signal from your network at the kegerator if
+            you plan to use Network mode;</li>
+          <li>there is an available outlet nearby to plug in the Brain;</li>
+          <li>there is room to rotate kegs into/out of your kegerator without
+            interfering with the cabling. </li>
+        </ul>
+        <p>The Brain can be placed inside or outside the kegerator:</p>
+        <ul>
+          <li> If placed inside, the USB cable that powers it must be run to the
+            outside. Be aware the WiFi signal at the Brain may be weakened when
+            installed inside, which may cause the system to feel sluggish. This
+            issue is location-specific and should be tested before the device is
+            fully installed inside.&nbsp; </li>
+          <li>If placed outside, the wiring harness(es) that connect to the
+            sensors must be run to the inside. This is the best placement option
+            if the WiFi network signal near the kegerator is weak. </li>
+        </ul>
+        <p>Ideas for routing the cabling:</p>
+        <ul>
+          <li><b>Home-built Keezer — </b>If the keezer has a wood collar, drill
+            a hole through the collar and pass the cabling through. Seal with
+            plumber's putty. If there is no collar, two other options are: (1)
+            Pass the cabling between the door and the freezer body, probably
+            near the back by the hinges. The door gasket should be flexible
+            enough to allow a good seal with the USB cable or wiring harnesses
+            in place. (2) Drill a hole through the lid close to the hinge side
+            and pass the cabling through. Seal with plumber's putty.&nbsp; </li>
+          <li><b>Home-built Kegerator — </b>Drill a hole through the door close
+            to the hinge side and pass the cabling through. Seal with plumber's
+            putty. Or pass the cabling between the door and the refrigerator
+            body, probably on the hinge side.&nbsp; </li>
+          <li><b>Commercial Kegerator — </b>Drilling a hole through the body of
+            a commercial kegerator is NOT recommended. Install the Brain inside
+            the kegerator, and pass the USB cable that powers it between the
+            door and the refrigerator body. The hinge side might be best. The
+            door gasket should be flexible enough to allow a good seal with the
+            USB cable in place. </li>
+        </ul>
+        <h3>Wiring harness</h3>
+        <p>The wiring harness is pre-assembled, pre-tested and labeled:</p>
+        <ul>
+          <li>Match the temperature probe connector with the mating harness
+            connector and plug it in firmly. Place the probe inside the
+            kegerator where it will not contact the kegs or the sides of the
+            kegerator.&nbsp; Placing the probe inside a small housing with
+            numerous holes in it allows the sensor to free-float without
+            touching anything inside the kegerator. A pickleball is ideal for
+            this application. </li>
+          <li>Match each flow sensor connector to the corresponding tap number
+            on the harness. Plug in each connector firmly. </li>
+          <li><b>IMPORTANT! </b>If you purchase sensors directly from KegLevel
+            Monitor, the sensors are pre-tested and pre-calibrated. If you
+            purchase them from Amazon or another online merchant, beware the
+            wiring of the sensor connector <b>MAY OR MAY NOT MATCH </b>the
+            wiring of the harness connector. There appears to be no industry
+            standard for
+            wire colors of the sensor connector. What matters is the <b>function
+              </b>of the wire colors at the <b>Brain's harness </b>and how
+            that relates to the <b>function </b>of the wires at the <b>sensor
+              connector:</b>
+            <ul>
+              <li>Brain harness YELLOW = VCC (supply voltage +5V to the sensor)</li>
+              <li>Brain harness BLACK = GND (ground to the sensor)</li>
+              <li>Brain harness RED = SIGNAL (signal from the sensor to the Brain)</li>
+            </ul>
+          </li>
+        </ul>
+        <div style="margin-left: 40px;">
+          <p>If the wiring of the sensor connector is not correct, it is easy to
+            fix. At the sensor connector, using a small flat-blade jeweler's
+            screwdriver or a safety pin, push in the pin's retention clip while
+            gently pulling out the pin. Do the same for the other wires that do
+            not match the Brain harness. Reinstall the pins in the correct
+            location being sure the pin is reinstalled with the retention pin in
+            the same orientation as when it was removed, and be sure it "clicks"
+            into place. Gently pull on the pin to make sure it does not slide
+            out on its own. If it does, pull out the pin and using the
+            screwdriver or safety pin, gently bend out the retention pin so it
+            protrudes slightly. It only needs to protrude a very small amount,
+            less than 1 mm.</p>
+        </div>
+        <h3>Validating the Installation</h3>
+        <p>Use a keg filled with sanitizing solution to test the installation,
+          as this also sanitizes the flow sensors and flushes out the beer
+          lines.</p>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Taps Screen -->
+      <section class="help-section" id="taps">
+        <h2>TAPS Screen</h2>
+        <p>The TAPS screen is the main dashboard. It shows a card for each
+          active tap with real-time information. Taps are assigned to a keg, and
+          a keg contains all of the beverage information. </p>
+        <h3>Tap Cards</h3>
+        <p>Each tap card displays:</p>
+        <ul>
+          <li><strong>Tap number</strong> — Tap 1 through Tap 5</li>
+          <li><strong>Beverage name</strong> — The name of the beverage in the keg</li>
+          <li><strong>ABV, IBU, SRM</strong> — Beverage stats</li>
+          <li><strong>Keg level</strong> — Visual indicator of the volume of
+            beverage remaining in the keg</li>
+          <li><strong>Keg name </strong>— The name of the keg assigned to the
+            tap</li>
+          <li><strong>Volume remaining</strong> — The volume of beverage
+            remaining in the keg</li>
+          <li><strong>Pour indicator</strong> — Shows Pouring during a pour;
+            Idle if no activity; Offline if no keg assigned; Leak? if a possible
+            leak has been detected</li>
+        </ul>
+        <h3>Tap Card Actions</h3>
+        <p>Click the <strong>keg icon</strong> on a tap card to open the keg
+          selection menu. From there you can:</p>
+        <ul>
+          <li>Assign a keg to the tap</li>
+          <li>Mark the current keg as Kicked:
+            <ul>
+              <li>Keg Kicked - Calibrate will perform a full-volume calibration of
+                the keg. Only do this if (1) the keg's tare weight and filled
+                weight were measured and entered <em>before </em>the keg was
+                assigned to the tap and (2) the keg was fully dispensed from this
+                tap. Follow the prompt to complete the action.</li>
+              <li>Keg Kicked - Mark Empty will zero the keg's volume, assign Empty
+                to the keg, and remove the keg assignment from the tap. Follow the
+                prompt to complete the action. </li>
+            </ul>
+          </li>
+          <li>Mark the tap Offline. Removes the keg assignment from the tap but
+            does not make any changes to the keg settings. </li>
+        </ul>
+        <h3>Temperature</h3>
+        <p>The current kegerator temperature is shown in the header bar at the
+          top left. It updates automatically. Blank if the temperature probe is
+          disconnected or faulty.</p>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Kegs Screen -->
+      <section class="help-section" id="kegs">
+        <h2>KEGS Screen</h2>
+        <p>The KEGS screen is your keg inventory. Each row shows a keg with its
+          stats and action buttons. Each keg used with your kegerator should be
+          added here. </p>
+        <h3>Adding a Keg</h3>
+        <p>Click <strong>+ ADD NEW</strong> to create a new keg:</p>
+        <ul>
+          <li><b>Keg Name </b>— Enter the keg name, maximum 24 characters, or
+            keep the default name</li>
+          <li><strong>Beverage</strong> — Select which beverage is in this keg</li>
+          <li><strong>Empty Weight (Tare) </strong>— Enter the empty (tare)
+            weight of the keg (only needs to be done once)</li>
+          <li><strong>Max Capacity</strong> — Enter the maximum capacity
+            (volume) the keg holds (only needs to be done once)</li>
+          <li><strong>Filled Weight (Total)</strong> — Enter the filled (total)
+            of the keg at the time it is placed in the kegerator; this will be
+            used to calculate the Volume at Fill</li>
+          <li><b>Volume at Fill </b>— Automatically calculated from the empty
+            and filled weights, and assumes a standard specific gravity of 1.014</li>
+          <li><strong>Tap assignment</strong> — Assign this keg to a tap, or
+            leave it Unassigned if a tap is not available</li>
+        </ul>
+        <h3>Editing a Keg </h3>
+        <p>Click the <strong>edit</strong> button or click on a keg row to edit
+          any of the settings. Saved changes are immediately reflected
+          on the tap card if the keg is assigned to a tap.&nbsp;</p>
+        <h3>Deleting a Keg</h3>
+        <p>Click the <strong>delete</strong> button on the keg row. You will be
+          asked to confirm. If a keg is assigned to a tap, deleting the keg
+          removes the assignment and sets the tap to Offline. Deleting a keg
+          does not affect Beverages.</p>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Beverages Screen -->
+      <section class="help-section" id="beverages">
+        <h2>BEVERAGES Screen</h2>
+        <p>The BEVERAGES screen is your beverage library. Each row shows a
+          beverage metrics, and action buttons. Every unique beer, cider, mead,
+          or other drink you serve should be added here.&nbsp;</p>
+        <h3>Adding a Beverage</h3>
+        <p>Click <strong>+ ADD NEW</strong> to create a new beverage:</p>
+        <ul>
+          <li><strong>Name</strong> — The beverage name (e.g. "American IPA")</li>
+          <li><strong>ABV</strong> — Alcohol by volume (e.g. 6.5)</li>
+          <li><strong>IBU</strong> — International Bitterness Units (e.g. 55)</li>
+          <li><strong>SRM</strong> — Standard Reference Method color value (e.g.
+            8). A color swatch preview is shown as you adjust this value.</li>
+        </ul>
+        <h3>Editing a Beverage</h3>
+        <p>Click the <strong>edit</strong> button or click on a beverage row to
+          edit any of the settings. Saved changes are immediately reflected
+          everywhere the beverage is used (tap cards, keg assignments, BatchFlow
+          cards).</p>
+        <h3>Deleting a Beverage</h3>
+        <p>Click the <strong>delete</strong> button on the beverage row. If the
+          beverage is currently assigned to a keg, you will be notified and must
+          remove it from the keg first.</p>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Settings: System -->
+      <section class="help-section" id="system">
+        <h2>SETTINGS: SYSTEM</h2>
+        <h3>Active Taps</h3>
+        <p>Set the number of taps you have sensors connected to. The Brain
+          supports up to 5 taps. Only active taps are shown on the Taps screen
+          and processed for flow detection and optional leak detection.</p>
+        <h3>Units</h3>
+        <p>Choose <strong>Metric</strong> (liters, Celsius) or <strong>Imperial</strong>
+          (gallons, Fahrenheit, US Imperial). This affects all volume and
+          temperature displays throughout the app <i>except </i>the volumes on
+          the CALIBRATION screen (to support the industry-standard treatment of
+          flow sensor data in metric volumes).</p>
+        <h3>Leak Detection</h3>
+        <p>Enable or disable Leak Detection. When enabled, if the system detects
+          a very slow flow rate over a 15-20 second time period (far slower than
+          a pour), the system generates a "Leak?" condition: the tap is
+          highlighted and shows "Leak?". If the NOTIFICATIONS screen has valid
+          email settings, a Conditional Notification is emailed. </p>
+        <h3>Network Mode / Standalone Mode</h3>
+        <p>Switch between Network Mode and Standalone Mode. See <a href="#provisioning">Provisioning</a>
+          for details on the differences between modes. Switching modes forces
+          the Brain to reboot immediately and enter the Provisioning mode.</p>
+        <div class="note">The button for the current mode is always disabled.</div>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Settings: Notifications -->
+      <section class="help-section" id="notifications">
+        <h2>SETTINGS: NOTIFICATIONS</h2>
+        <p>The KegLevel Brain can send email notifications using free email
+          service at mailgun.com. A free Mailgun account is sufficient for
+          typical usage.</p>
+        <div class="note">Notifications require Network Mode with Internet
+          access. Notifications are not available in Standalone Mode.</div>
+        <h3>Mailgun Credentials</h3>
+        <p>First set up an account (free) at Mailgun.com, then configure the Brain
+          for notifications:</p>
+        <ol>
+          <li>Navigate to <a href="https://www.mailgun.com" target="_blank">mailgun.com</a>
+            and click <b><i>Start for free </i></b>to create a new account. If
+            there is an "Add payment info now" checkbox, be sure to uncheck it.
+            Enter your desired password and confirm it, then click Create New
+            Account. </li>
+          <li>At the dashboard, you'll see a notice that you must verify your
+            email address first. Open your email, find the verification email from
+            Mailgun (it may be in your Spam folder), and click Verify your Email
+            Address. </li>
+          <li>Verifying email address calls up a window for you to also verify
+            through SMS (text) as well. This is to prevent abuse of their
+            system. Follow the instructions to validate via text.</li>
+          <li>When the text has been validated, the Mailgun login window will
+            appear. Log in and you'll see the Create an API key helper. Enter a
+            name for the API key (such as KegLevel Brain) and click Create API
+            Key. </li>
+          <li>When the API key has been created, the helper called<b> Copy and
+              run the code in your IDE</b> expands. You only care about the two
+            Mailgun credentials: API Key and the Sandbox domain. Copy them and
+            paste them into a text editor and save for safekeeping.&nbsp; </li>
+          <li>Copy and paste each of the credentials into the corresponding
+            fields on the NOTIFICATIONS screen.</li>
+          <li>Enter your email address and click <b>SAVE. </b><br>
+            <div class="note">You MUST use the same email address as your
+              Mailgun account. Otherwise Mailgun will ignore the requests.</div>
+          </li>
+          <li>Click <strong>TEST SEND</strong> to verify the configuration. You
+            should receive a test email.</li>
+        </ol>
+        <h3>Scheduled Notifications</h3>
+        <p>Select the <b>Notification Frequency </b>to receive periodic email
+          reports summarizing your keg levels and temperature. </p>
+        <h3>Conditional Notifications</h3>
+        <p>Set thresholds for a Conditional report to be sent when the threshold
+          is crossed:</p>
+        <ul>
+          <li><strong>Low Volume</strong> — Triggered when any keg drops below
+            the set volume. Slide to OFF to disable.</li>
+          <li><strong>Low Temp</strong> — Triggered when the kegerator
+            temperature drops below the set threshold. Useful for detecting
+            cooling control malfunctions.</li>
+          <li><strong>High Temp</strong> — Triggered when the kegerator
+            temperature rises above the set threshold. Useful for detecting
+            door-left-open or cooling failure.</li>
+        </ul>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Settings: Updates -->
+      <section class="help-section" id="updates">
+        <h2>SETTINGS: UPDATES</h2>
+        <p>The KegLevel Brain supports over-the-air (OTA) firmware updates. When
+          a new version is available, you can install it directly from this
+          screen without disconnecting anything.</p>
+        <div class="note">OTA updates require Network Mode with Internet access.
+          They are not available in Standalone Mode.</div>
+        <h3>Checking for Updates</h3>
+        <p>Click <strong>CHECK</strong> to query the update server. The current
+          firmware version is shown at the top of the screen. If a newer version
+          is available, the updates are listed and the <strong>INSTALL</strong>
+          button will become active.</p>
+        <h3>Installing an Update</h3>
+        <p>Click <strong>INSTALL</strong> to begin the update. A progress bar
+          will show the download and installation progress. The update log shows
+          detailed status messages. After installation completes, click <strong>RELOAD</strong>
+          to refresh the browser window for the new firmware.&nbsp;</p>
+        <div class="note">Do not power off the Brain during a firmware update.
+          The web UI is included with the firmware and updates automatically.</div>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Settings: About -->
+      <section class="help-section" id="about">
+        <h2>SETTINGS: ABOUT</h2>
+        <p>The About screen displays copyright information, brand
+          acknowledgements, and a link to support the project with an additional
+          donation.</p>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Settings: Calibration -->
+      <section class="help-section" id="calibration">
+        <h2>SETTINGS: CALIBRATION</h2>
+        <p>Sensors purchased from KegLevel Monitor are calibrated using pour
+          calibration. The K-factor is written on the sensor. This K-factor
+          should be used until an entire keg has been dispensed through the
+          sensor, then the Keg Kicked calibration should be performed. This will
+          provide the most accurate measurements.</p>
+        <ul>
+          <li><strong>Pour Calibration </strong>— A small volume is poured, measured,
+            and entered. The system calculates the K-factor based on this pour.
+            This is done at the CALIBRATION screen. This method is fast but not
+            highly accurate.&nbsp; </li>
+          <li><strong>Keg Kicked Calibration </strong>— An entire keg is
+            dispensed from full to empty. The system calculates the K-factor
+            based on the total number of pulses counted and the starting volume
+            of the kicked keg. This is done at the TAPS screen. This method is
+            not fast but highly accurate. </li>
+        </ul>
+        <h3>Workflow for Most Accurate Measurements </h3>
+        <ol>
+          <li>At the CALIBRATION screen,
+            for the tap/sensor to be calibrated, enter the K-factor written on
+            the sensor. If the K-factor is not written on the sensor, perform
+            a Pour Calibration and enter that K-factor. </li>
+          <li>Weigh an empty keg (with the lid on) and write that empty weight
+            on the keg. </li>
+          <li>Fill the keg and weigh it, and write that filled weight on the
+            keg. </li>
+          <li>Install the keg in the kegerator and connect the tap. </li>
+          <li>At the KEGS screen, select the keg, enter the tare weight (only
+            needs to be done once), the max capacity of the keg (only needs to
+            be done once), and the filled weight. The Brain will calculate the
+            volume. Assign the keg to the tap and Save. </li>
+          <li>When the entire keg has been dispensed (keg kicks), at the TAPS
+            screen, click on the tap card and select [ Keg Kicked - Calibrate
+            ]. Review the metrics for the keg. You'll see "CALCULATED NEW
+            K-FACTOR" which is based on the total number of pulses counted for
+            the dispensed volume of the keg. If the metrics look correct,
+            click the checkbox "This keg is empty and was fully dispensed from
+            this tap." to confirm. Click SAVE CALIBRATION &amp; RESET to save
+            the new K-factor for the tap/sensor. </li>
+          <li>This process usually needs to be done only once. As long as the
+            keg kicks within a pint or two of the zero measurement the
+            calibration is accurate. If necessary the Keg Kicked calibration
+            can be repeated. </li>
+        </ol>
+        <div class="note">The Temp sensor is factory-calibrated and requires no
+          user calibration.</div>
+        <h3>How to perform the Pour Calibration </h3>
+        <ol>
+          <li>Go to <strong>Settings &gt; CALIBRATION</strong>.</li>
+          <li>Select the tap you want to calibrate. The tap button will
+            highlight and the Brain gets ready to count pulses. </li>
+          <li>If the sensor has already been calibrated using this method, the
+            K-factor should be written on the sensor. You can simply enter this
+            as the New K-factor and click SAVE CALIBRATION, or you can continue
+            with the calibration below. </li>
+          <li>Pour a <strong>known volume</strong> of liquid through that tap
+            into a measuring container. Pour only from the selected tap.</li>
+          <li>Use the <strong>Measured Volume</strong> slider (or +/− buttons)
+            to enter the exact volume you poured.</li>
+          <li>The <strong>New K-Factor</strong> is calculated automatically
+            from the measured volume and pulse count.</li>
+          <li>Click <strong>SAVE CALIBRATION</strong> to apply the new
+            K-factor.</li>
+        </ol>
+        <h3>Other Calibration Actions</h3>
+        <ul>
+          <li><strong>RESET PULSES</strong> — Clears the pulse counter to zero
+            so you can start a fresh calibration pour.</li>
+          <li><strong>SET TO DEFAULT</strong> — Resets the K-factor to the
+            factory default (2900 pulses per liter).</li>
+        </ul>
+        <h3>Tips for Best Results</h3>
+        <ul>
+          <li>Use a graduated measuring container for accurate volume
+            measurement.</li>
+          <li>Pour at least 500 mL for a reliable calibration — larger volumes
+            produce more accurate results.</li>
+          <li>Pour at a normal pace, similar to how you would pour a glass of
+            beer.</li>
+          <li>If the <strong>Deduct volume from Inventory</strong> checkbox is
+            checked, the poured volume will be subtracted from the keg's current
+            level, using the current K-factor to calculate the volume poured
+            from the keg. </li>
+        </ul>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Settings: Logs -->
+      <section class="help-section" id="logs">
+        <h2>SETTINGS: LOGS</h2>
+        <p>The LOGS screen provides a pour history.</p>
+        <ul>
+          <li><strong>By Day</strong> — Graphs daily total pours for the most recent 30 days</li>
+          <li><strong>By Tap</strong> — Graphs total pours for each tap</li>
+          <li><strong>Data Table </strong>— Lists metrics for each pour;
+            maintains the most recent 1,000 pours</li>
+          <li><strong>DOWNLOAD CSV&nbsp;</strong> — Saves a copy of the log to
+            the host computer</li>
+          <li><strong>CLEAR LOG</strong> — Follow the prompt to clear the log
+            (cannot be undone) or cancel</li>
+        </ul>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- BatchFlow -->
+      <section class="help-section" id="batchflow">
+        <h2>BatchFlow</h2>
+        <p>BatchFlow is a built-in brewing workflow board that helps you track
+          batches from recipe to finished keg. It opens in a separate window
+          from the <strong>BatchFlow</strong> button in the app header.</p>
+        <p>BatchFlow has its own help system. Click the <strong>?</strong>
+          button inside the BatchFlow web app for detailed instructions on using
+          the workflow board, adding batches, moving cards between columns, and
+          editing beverages.</p>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- Troubleshooting -->
+      <section class="help-section" id="troubleshooting">
+        <h2>Troubleshooting</h2>
+        <h3>LED Indicator</h3>
+        <table>
+          <tbody>
+            <tr>
+              <th>LED Behavior</th>
+              <th>Meaning</th>
+            </tr>
+            <tr>
+              <td>Blinking slowly</td>
+              <td>Brain is provisioning; the WiFi mode has not been selected. Refer
+                to <a href="#provisioning">Provisioning</a>.&nbsp;</td>
+            </tr>
+            <tr>
+              <td>Solid on</td>
+              <td>Brain is connected to WiFi (either Network or Standalone) and
+                is operating normally</td>
+            </tr>
+            <tr>
+              <td>LED off</td>
+              <td>Brain has lost power or hard crashed — unplug and plug in
+                again</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3>Common Issues</h3>
+        <table>
+          <tbody>
+            <tr>
+              <th>Problem</th>
+              <th>Possible Cause &amp; Fix</th>
+            </tr>
+            <tr>
+              <td>Web page loads from phone but not from PC</td>
+              <td>Windows Firewall or a proxy may be intercepting traffic on
+                port 80. Try disabling the firewall temporarily to test.</td>
+            </tr>
+            <tr>
+              <td>No pulses counted during pour</td>
+              <td>Check the sensor wiring. Ensure the sensor connector is fully
+                seated in the wiring harness. Try a different tap to isolate
+                whether the issue is the sensor or the wiring.</td>
+            </tr>
+            <tr>
+              <td>Temperature shows "—" or no reading</td>
+              <td>The temperature probe may be disconnected. Check the sensor
+                connector on the wiring harness.</td>
+            </tr>
+            <tr>
+              <td>Can't connect to KegLevel-Brain WiFi</td>
+              <td>The Brain may not be in Standalone mode, or it may still be
+                booting. Wait 30 seconds after powering on and try again. If the
+                issue persists, provision again. Refer to <a href="#wifi-reset">WiFi Reset</a>. </td>
+            </tr>
+            <tr>
+              <td>Notifications not sending</td>
+              <td>Verify that the Brain is in Network mode with Internet access.
+                Double-check the Mailgun API key, domain, and email addresses on
+                the Notifications settings screen. Use TEST SEND to diagnose.
+                Check the Spam folder in your email program.</td>
+            </tr>
+            <tr>
+              <td>OTA update fails</td>
+              <td>Ensure the Brain has a stable Internet connection. Do not
+                power off during the update. If the update fails, the previous
+                firmware should still be running — try again.</td>
+            </tr>
+          </tbody>
+        </table>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+
+      <!-- WiFi Reset -->
+      <section class="help-section" id="wifi-reset">
+        <h2>WiFi Reset</h2>
+        <p>If you cannot locate the KegLevel Brain either on your WiFi network
+          (Network mode) or at 192.168.4.1 (Standalone mode) you have a few
+          options. If you set up in Network mode, you can use your network
+          router's configuration pages to find all of the devices connected to
+          WiFi on the network. You can also use a app such as Fing on your phone
+          to locate devices on your WiFi network. </p>
+        <p>If those don't work, you can "force" provisioning using the WiFi Reset
+          button. Unplug the Brain, remove the cover and locate the black reset
+          button mounted on the larger PC board (not the white button on the
+          Pico). Plug in the Brain and give it 10 seconds to boot up. Press and
+          hold the WiFi reset button for about 5 seconds, until the LED switches
+          from rapid flashing to steady on, then release the button. The LED
+          should begin blinking slowly indicating it is in provisioning mode.
+          Refer to <a href="#provisioning">Provisioning</a>.</p>
+        <a href="#toc" class="back-to-top">↑ Back to top</a>
+      </section>
+    </div>
+  </body>
 </html>
