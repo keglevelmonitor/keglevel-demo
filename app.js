@@ -877,8 +877,10 @@ function setOtaProgress(fraction) {
 function setOtaButtonsDisabled(disabled) {
   const check = document.getElementById('settings-check');
   const install = document.getElementById('settings-install');
+  const reload = document.getElementById('settings-restart');
   if (check) check.disabled = disabled;
   if (install) install.disabled = disabled;
+  if (reload) reload.disabled = disabled;
 }
 
 async function sha256Hex(data) {
@@ -911,6 +913,7 @@ async function loadUpdatesTab() {
   updatesLog = [];
   updatesFirmwareAvailable = null;
   document.getElementById('settings-install').disabled = true;
+  document.getElementById('settings-restart').disabled = !!otaInProgress;
   if (base) {
     try {
       const v = await apiFetch('/api/version');
@@ -1178,6 +1181,7 @@ async function waitForReboot(base, expectedVersion) {
 }
 
 function reloadPage() {
+  if (otaInProgress) return;
   window.location.href = window.location.pathname + '?_=' + Date.now();
 }
 
