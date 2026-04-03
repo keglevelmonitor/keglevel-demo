@@ -1683,11 +1683,11 @@ async function openKegEdit(kegId) {
   title.textContent = kegId ? 'Edit Keg' : 'Add Keg';
 
   try {
-  const [beverages, kegs, kegData] = await Promise.all([
+  const [beverages, kegs] = await Promise.all([
     apiFetch('/api/beverages'),
     apiFetch('/api/kegs'),
-    kegId ? apiFetch(`/api/kegs/${kegId}`) : Promise.resolve(null),
   ]);
+  const kegData = kegId ? (kegs || []).find(k => k.id === kegId) || null : null;
   beverageSelect.innerHTML = '<option value="">— None —</option>' +
     (beverages || []).sort((a, b) => (a.name || '').localeCompare(b.name || ''))
     .map((b) => `<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('');
