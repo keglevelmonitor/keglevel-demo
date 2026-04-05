@@ -1034,6 +1034,34 @@ body {
   margin: 4px 0;
 }
 
+.alerts-sub-label {
+  margin-top: 16px !important;
+}
+
+.alerts-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.alerts-checkbox {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
+  font-size: 14px !important;
+  color: #ccc !important;
+  cursor: pointer;
+}
+
+.alerts-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #ffa500;
+  cursor: pointer;
+}
+
 .btn-secondary {
   margin-top: 16px;
   padding: 10px 20px;

@@ -413,7 +413,8 @@
 
     /* --- Alerts (stub) -------------------------------------------- */
     if (method === "GET" && path === "/api/alerts/config") {
-      return ok({
+      const saved = JSON.parse(localStorage.getItem("demo_alerts_config") || "null");
+      return ok(saved || {
         mailgun_api_key: "***",
         mailgun_domain: "",
         from_email: "",
@@ -424,9 +425,13 @@
         low_volume_threshold_liters: 0,
         low_temp_threshold_f: 27,
         high_temp_threshold_f: 200,
+        log_summary_by_day: false,
+        log_summary_by_tap: false,
+        log_summary_detailed: false,
       });
     }
     if (method === "PUT" && path === "/api/alerts/config") {
+      localStorage.setItem("demo_alerts_config", JSON.stringify(body));
       return ok({ status: "ok", alerts: body });
     }
     if (method === "POST" && path === "/api/alerts/test") {

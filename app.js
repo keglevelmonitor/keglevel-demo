@@ -275,6 +275,9 @@ async function pollOnce() {
     consecutiveFailures = 0;
     lastData = data;
     setConnectionState('connected');
+    if (data.calibration?.standby && !calState.standby) {
+      apiFetch('/api/calibration/standby', { method: 'POST', body: JSON.stringify({ active: false }) }).catch(() => {});
+    }
     syncActiveTapsFromData(data);
     renderTapCards(data);
     updateHeader(data);
@@ -480,13 +483,23 @@ function showSettingsSubActions(ids) {
   });
 }
 
+async function disableCalStandby() {
+  if (!calState.standby) return;
+  calState.standby = false;
+  calState.lockedTap = -1;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      await apiFetch('/api/calibration/standby', { method: 'POST', body: JSON.stringify({ active: false }) });
+      return;
+    } catch (_) {
+      await new Promise(r => setTimeout(r, 300));
+    }
+  }
+}
+
 function cleanupSettings() {
   calStopPoll();
-  if (calState.standby) {
-    apiFetch('/api/calibration/standby', { method: 'POST', body: JSON.stringify({ active: false }) }).catch(() => {});
-    calState.standby = false;
-  }
-  calState.lockedTap = -1;
+  disableCalStandby();
 }
 
 function navigateToDashboard() {
@@ -730,6 +743,7 @@ function setActiveSettingsTab(tabId) {
     pausePolling();
   } else {
     calStopPoll();
+    disableCalStandby();
     if (connectionState === 'connected') resumePolling();
   }
   initSettingsTab(tabId);
@@ -756,7 +770,14 @@ async function loadAlertsConfig() {
     document.getElementById('alerts-frequency').value = cfg.push_enabled
       ? (cfg.push_interval || 'daily')
       : 'none';
-    document.getElementById('alerts-api-key').value = cfg.mailgun_api_key === '***' ? '' : (cfg.mailgun_api_key || '');
+    const apiKeyEl = document.getElementById('alerts-api-key');
+    if (cfg.mailgun_api_key === '***') {
+      apiKeyEl.value = '';
+      apiKeyEl.placeholder = 'api-key-hidden';
+    } else {
+      apiKeyEl.value = cfg.mailgun_api_key || '';
+      apiKeyEl.placeholder = 'key-xxx...';
+    }
     document.getElementById('alerts-domain').value = cfg.mailgun_domain || '';
     document.getElementById('alerts-email').value = cfg.to_email || cfg.from_email || '';
     const lowVol = parseFloat(cfg.low_volume_threshold_liters ?? 0);
@@ -765,6 +786,9 @@ async function loadAlertsConfig() {
     document.getElementById('alerts-low-vol').value = lowVol;
     document.getElementById('alerts-low-temp').value = lowTemp;
     document.getElementById('alerts-high-temp').value = highTemp > 61 ? 0 : highTemp;
+    document.getElementById('alerts-log-by-day').checked = !!cfg.log_summary_by_day;
+    document.getElementById('alerts-log-by-tap').checked = !!cfg.log_summary_by_tap;
+    document.getElementById('alerts-log-detailed').checked = !!cfg.log_summary_detailed;
     updateAlertsSliderLabels();
   } catch (_) {}
 }
@@ -814,6 +838,9 @@ async function saveAlertsConfig() {
       low_volume_threshold_liters: lowVol,
       low_temp_threshold_f: lowTemp,
       high_temp_threshold_f: highTemp,
+      log_summary_by_day: document.getElementById('alerts-log-by-day').checked,
+      log_summary_by_tap: document.getElementById('alerts-log-by-tap').checked,
+      log_summary_detailed: document.getElementById('alerts-log-detailed').checked,
     };
     if (apiKey) payload.mailgun_api_key = apiKey;
     else payload.mailgun_api_key = '***';
