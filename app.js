@@ -724,7 +724,7 @@ async function confirmClearLog() {
 
 const SUB_ACTION_MAP = {
   system: [],
-  alerts: ['settings-alerts-test', 'settings-alerts-save'],
+  alerts: ['settings-alerts-test'],
   updates: ['settings-check', 'settings-install', 'settings-restart'],
   about: [],
   calibration: ['settings-cal-save', 'settings-cal-reset', 'settings-cal-default'],
@@ -818,9 +818,7 @@ function setBtnSaving(btn, saving, loadingText) {
 }
 
 async function saveAlertsConfig() {
-  const btn = document.getElementById('settings-alerts-save');
   try {
-    setBtnSaving(btn, true);
     const freq = document.getElementById('alerts-frequency').value;
     const apiKey = document.getElementById('alerts-api-key').value.trim();
     const lowVol = parseFloat(document.getElementById('alerts-low-vol').value) || 0;
@@ -845,12 +843,7 @@ async function saveAlertsConfig() {
     if (apiKey) payload.mailgun_api_key = apiKey;
     else payload.mailgun_api_key = '***';
     await apiFetch('/api/alerts/config', { method: 'PUT', body: JSON.stringify(payload) });
-    alert('Alert settings saved.');
-  } catch (e) {
-    alert('Failed to save: ' + (e.message || e));
-  } finally {
-    setBtnSaving(btn, false);
-  }
+  } catch (_) {}
 }
 
 async function sendTestAlert() {
@@ -2508,6 +2501,17 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     window.open('help.html#' + anchor, '_blank');
+  });
+
+  ['alerts-frequency', 'alerts-log-by-day', 'alerts-log-by-tap', 'alerts-log-detailed'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('change', saveAlertsConfig);
+  });
+  ['alerts-api-key', 'alerts-domain', 'alerts-email'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('blur', saveAlertsConfig);
+  });
+  ['alerts-low-vol', 'alerts-low-temp', 'alerts-high-temp'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('input', updateAlertsSliderLabels);
+    document.getElementById(id)?.addEventListener('change', saveAlertsConfig);
   });
 
   document.getElementById('settings-cal-default').addEventListener('click', setCalToDefault);
