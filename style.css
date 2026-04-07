@@ -74,55 +74,42 @@ body {
   color: #737373;
 }
 
-/* Main header — matches Pico app: solid black bar, centered title, blue temp */
+/* Main header — title left, demo badges center, temp right */
 .main-header {
   display: flex;
-  justify-content: center;
   align-items: center;
   padding: 0 16px;
   height: 50px;
   background: #141414;
-  position: relative;
   flex-shrink: 0;
 }
 
 .main-header h1 {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: #ffa500;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.main-header.offline h1 {
-  color: #f87171;
-}
-
-.main-header.searching h1 {
-  color: #737373;
-}
-
-.btn-batchflow {
-  margin-left: auto;
-  padding: 5px 12px;
-  border: none;
-  border-radius: 4px;
-  background: #3399ff;
-  color: #1a1a1a;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
   white-space: nowrap;
+  transition: color 0.3s;
 }
-.btn-batchflow:hover { background: #5cb0ff; }
+
+.main-header:not(.connected) h1 {
+  color: #999;
+}
+
+.demo-badges-row {
+  display: flex;
+  margin-left: auto;
+  gap: 12px;
+  padding-right: 16px;
+  align-items: center;
+}
 
 .temp {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: #3399ff;
-  margin-right: auto;
+  white-space: nowrap;
 }
 
 /* Screens */
@@ -887,7 +874,7 @@ body {
 }
 
 .main-header.standalone h1 {
-  border: 2px solid #ffa500;
+  border: 2px solid currentColor;
   border-radius: 6px;
   padding: 2px 14px;
 }
@@ -1381,27 +1368,6 @@ body {
 }
 
 /* Demo badge & notice */
-.demo-badge {
-  background: #ffc107;
-  color: #000;
-  font-size: 11px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 4px;
-  letter-spacing: 1px;
-  vertical-align: middle;
-  flex-shrink: 0;
-  position: absolute;
-  z-index: 1;
-}
-.demo-badge-left {
-  left: 33%;
-  transform: translateX(-50%);
-}
-.demo-badge-right {
-  right: 33%;
-  transform: translateX(50%);
-}
 .demo-disabled {
   opacity: 0.45;
   pointer-events: none;
@@ -1417,8 +1383,7 @@ body {
   border-radius: 4px;
   letter-spacing: 0.5px;
   text-decoration: none;
-  position: absolute;
-  z-index: 1;
+  white-space: nowrap;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -1436,8 +1401,7 @@ body {
   border-radius: 4px;
   letter-spacing: 0.5px;
   text-decoration: none;
-  position: absolute;
-  z-index: 1;
+  white-space: nowrap;
   cursor: pointer;
   transition: background 0.15s;
 }

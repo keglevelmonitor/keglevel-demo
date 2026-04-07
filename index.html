@@ -13,11 +13,12 @@
   <div id="app">
     <!-- Main header -->
     <header class="main-header">
-      <span id="temp" class="temp"></span>
-      <a class="btn-learn-more demo-badge-left" href="https://www.youtube.com/watch?v=PLACEHOLDER" target="_blank">LEARN MORE</a>
       <h1 id="brand">KegLevel Brain</h1>
-      <a class="btn-purchase demo-badge-right" href="https://keglevelmonitor.github.io/keglevel-demo/purchase.html" target="_blank">BUY NOW</a>
-      <button class="btn-batchflow" id="btn-batchflow">BatchFlow</button>
+      <div class="demo-badges-row">
+        <a class="btn-learn-more" href="https://www.youtube.com/watch?v=PLACEHOLDER" target="_blank">LEARN MORE</a>
+        <a class="btn-purchase" href="https://keglevelmonitor.github.io/keglevel-demo/purchase.html" target="_blank">BUY NOW</a>
+      </div>
+      <span id="temp" class="temp"></span>
     </header>
     <input type="hidden" id="pico-ip" />
 
@@ -27,6 +28,7 @@
       <button id="btn-nav-kegs" class="nav-btn">KEGS</button>
       <button id="btn-nav-beverages" class="nav-btn">BEVERAGES</button>
       <button id="btn-nav-settings" class="nav-btn">SETTINGS</button>
+      <button id="btn-batchflow" class="nav-btn">BATCHFLOW</button>
       <button class="help-btn" title="Help">?</button>
     </nav>
 
@@ -291,6 +293,8 @@
             <input type="range" id="alerts-low-temp" min="27" max="45" step="1" value="33" disabled />
             <label>High Temp Alert <span id="alerts-high-temp-label">(45 °F)</span></label>
             <input type="range" id="alerts-high-temp" min="0" max="61" step="1" value="45" disabled />
+            <label>Low Gas Alert <span id="alerts-low-gas-label">(OFF)</span></label>
+            <input type="range" id="alerts-low-gas" min="0" max="20" step="1" value="0" disabled />
           </div>
         </div>
         <!-- UPDATES tab -->
